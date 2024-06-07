@@ -15,7 +15,6 @@ type CustomerService struct {
 	log      logger.LoggerI
 	strg     storage.StorageI
 	services client.ServiceManagerI
-	*user_service.UnimplementedCustomerServiceServer
 }
 
 func NewCustomerService(cfg config.Config, log logger.LoggerI, strg storage.StorageI, srvs client.ServiceManagerI) *CustomerService {
@@ -26,11 +25,11 @@ func NewCustomerService(cfg config.Config, log logger.LoggerI, strg storage.Stor
 		services: srvs,
 	}
 }
-func (c *CustomerService) Create(ctx context.Context, req *user_service.CreateCustomer) (resp *user_service.CustomerPrimaryKey, err error) {
+func (c *CustomerService) Create(ctx context.Context, req *user_service.CreateCustomer) (*user_service.CustomerPrimaryKey, error) {
 
 	c.log.Info("---CreateCustomer--->>>", logger.Any("req", req))
 
-	resp, err = c.strg.Customer().Create(ctx, req)
+	resp, err := c.strg.Customer().Create(ctx, req)
 	if err != nil {
 		c.log.Error("---CreateCustomer--->>>", logger.Error(err))
 		return nil, err
@@ -39,10 +38,10 @@ func (c *CustomerService) Create(ctx context.Context, req *user_service.CreateCu
 	return resp, nil
 }	
 
-func (c *CustomerService) GetByID(ctx context.Context, req *user_service.CustomerPrimaryKey) (resp *user_service.Customer, err error) {
+func (c *CustomerService) GetByID(ctx context.Context, req *user_service.CustomerPrimaryKey) (*user_service.Customer, error) {
 	c.log.Info("---GetByIdCustomer--->>>", logger.Any("req", req))
 
-	resp, err = c.strg.Customer().GetByID(ctx, req)
+	resp, err := c.strg.Customer().GetByID(ctx, req)
 	if err != nil {
 		c.log.Error("---GetByIdCustomer--->>>", logger.Error(err))
 		return nil, err
@@ -51,10 +50,10 @@ func (c *CustomerService) GetByID(ctx context.Context, req *user_service.Custome
 	return resp, nil
 }
 
-func (c *CustomerService) GetList(ctx context.Context, req *user_service.GetListCustomerRequest) (resp *user_service.GetListCustomerResponse, err error) {
+func (c *CustomerService) GetList(ctx context.Context, req *user_service.GetListCustomerRequest) (*user_service.GetListCustomerResponse, error) {
 	c.log.Info("---GetAllCustomer--->>>", logger.Any("req", req))
 
-	resp, err = c.strg.Customer().GetList(ctx, req)
+	resp, err := c.strg.Customer().GetList(ctx, req)
 	if err != nil {
 		c.log.Error("---GetAllCustomer--->>>", logger.Error(err))
 		return nil, err
@@ -63,10 +62,10 @@ func (c *CustomerService) GetList(ctx context.Context, req *user_service.GetList
 	return resp, nil
 }
 
-func (c *CustomerService) Update(ctx context.Context,req *user_service.UpdateCustomerRequest) (resp *user_service.UpdateCustomerResponse,err error) {
+func (c *CustomerService) Update(ctx context.Context,req *user_service.UpdateCustomerRequest) (*user_service.UpdateCustomerResponse,error) {
 	c.log.Info("---UpdateCustomer--->>>", logger.Any("req", req))
 
-	resp, err = c.strg.Customer().Update(ctx, req)
+	resp, err := c.strg.Customer().Update(ctx, req)
 	if err != nil {
 		c.log.Error("---UpdateCustomer--->>>", logger.Error(err))
 		return nil, err
@@ -75,10 +74,10 @@ func (c *CustomerService) Update(ctx context.Context,req *user_service.UpdateCus
 	return resp, nil
 }
 
-func (c *CustomerService) Delete(ctx context.Context,req *user_service.CustomerPrimaryKey) (resp *user_service.Empty,err error) {
+func (c *CustomerService) Delete(ctx context.Context,req *user_service.CustomerPrimaryKey) (*user_service.Empty,error) {
 	c.log.Info("---DeleteCustomer--->>>", logger.Any("req", req))
 
-	resp, err = c.strg.Customer().Delete(ctx, req)
+	resp, err := c.strg.Customer().Delete(ctx, req)
 	if err != nil {
 		c.log.Error("---DeleteCustomer--->>>", logger.Error(err))
 		return nil, err

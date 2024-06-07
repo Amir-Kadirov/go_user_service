@@ -22,9 +22,9 @@ func NewCustomerRepo(db *pgxpool.Pool) storage.CustomerRepoI {
 	}
 }
 
-func (c *customerRepo) Create(ctx context.Context, req *ct.CreateCustomer) (resp *ct.CustomerPrimaryKey, err error) {
+func (c *customerRepo) Create(ctx context.Context, req *ct.CreateCustomer) (*ct.CustomerPrimaryKey, error) {
 	id := uuid.NewString()
-	resp = &ct.CustomerPrimaryKey{Id: id}
+	resp := &ct.CustomerPrimaryKey{Id: id}
 
 	query := `INSERT INTO customers (
 			phone,
@@ -42,7 +42,7 @@ func (c *customerRepo) Create(ctx context.Context, req *ct.CreateCustomer) (resp
 				$6,
 				NOW()
 			)`
-	_, err = c.db.Exec(ctx, query, req.Phone, req.Gmail, req.Language, &req.DateOfBirth, req.Gender, id)
+	_, err := c.db.Exec(ctx, query, req.Phone, req.Gmail, req.Language, &req.DateOfBirth, req.Gender, id)
 	if err != nil {
 		log.Println("error while creating customer")
 		return nil, err
@@ -51,8 +51,8 @@ func (c *customerRepo) Create(ctx context.Context, req *ct.CreateCustomer) (resp
 	return resp, err
 }
 
-func (c *customerRepo) GetByID(ctx context.Context, req *ct.CustomerPrimaryKey) (resp *ct.Customer, err error) {
-	resp = &ct.Customer{}
+func (c *customerRepo) GetByID(ctx context.Context, req *ct.CustomerPrimaryKey) (*ct.Customer, error) {
+	resp := &ct.Customer{}
 	query := `SELECT id,
 				   phone,
 				   gmail,
@@ -86,8 +86,8 @@ func (c *customerRepo) GetByID(ctx context.Context, req *ct.CustomerPrimaryKey) 
 	return resp, nil
 }
 
-func (c *customerRepo) GetList(ctx context.Context, req *ct.GetListCustomerRequest) (resp *ct.GetListCustomerResponse, err error) {
-	resp = &ct.GetListCustomerResponse{}
+func (c *customerRepo) GetList(ctx context.Context, req *ct.GetListCustomerRequest) (*ct.GetListCustomerResponse, error) {
+	resp := &ct.GetListCustomerResponse{}
 
 	filter := ""
     offset := (req.Offset - 1) * req.Limit
@@ -145,8 +145,8 @@ func (c *customerRepo) GetList(ctx context.Context, req *ct.GetListCustomerReque
 	return resp, nil
 }
 
-func (c *customerRepo) Update(ctx context.Context, req *ct.UpdateCustomerRequest) (resp *ct.UpdateCustomerResponse, err error) {
-	resp = &ct.UpdateCustomerResponse{Message: "Customer updated successfully"}
+func (c *customerRepo) Update(ctx context.Context, req *ct.UpdateCustomerRequest) (*ct.UpdateCustomerResponse, error) {
+	resp := &ct.UpdateCustomerResponse{Message: "Customer updated successfully"}
 	query := `UPDATE customers SET phone=$1,
 								 gmail=$2,
 								 language=$3,
@@ -154,7 +154,7 @@ func (c *customerRepo) Update(ctx context.Context, req *ct.UpdateCustomerRequest
 								 gender=$5,
 								 updated_at=NOW()
 								 WHERE id=$6 AND deleted_at is null`
-	_, err = c.db.Exec(ctx, query, req.Phone, req.Gmail, req.Language, req.DateOfBirth, req.Gender, req.Id)
+	_, err := c.db.Exec(ctx, query, req.Phone, req.Gmail, req.Language, req.DateOfBirth, req.Gender, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -162,13 +162,14 @@ func (c *customerRepo) Update(ctx context.Context, req *ct.UpdateCustomerRequest
 	return resp, nil
 }
 
-func (c *customerRepo) Delete(ctx context.Context, req *ct.CustomerPrimaryKey) (resp *ct.Empty, err error) {
+func (c *customerRepo) Delete(ctx context.Context, req *ct.CustomerPrimaryKey) (*ct.Empty, error) {
+	resp:=&ct.Empty{}
 	query := `UPDATE customers SET
 							 deleted_at=NOW()
 							 WHERE id=$1 RETURNING created_at`
 
 	var createdAt sql.NullTime
-	err = c.db.QueryRow(ctx, query, req.Id).Scan(&createdAt)
+	err := c.db.QueryRow(ctx, query, req.Id).Scan(&createdAt)
 	if err != nil {
 		return nil, err
 	}

@@ -91,7 +91,7 @@ func (c *sellerServiceClient) Delete(ctx context.Context, in *SellerPrimaryKey, 
 }
 
 // SellerServiceServer is the server API for SellerService service.
-// All implementations must embed UnimplementedSellerServiceServer
+// All implementations should embed UnimplementedSellerServiceServer
 // for forward compatibility
 type SellerServiceServer interface {
 	Create(context.Context, *CreateSeller) (*SellerPrimaryKey, error)
@@ -99,10 +99,9 @@ type SellerServiceServer interface {
 	GetList(context.Context, *GetListSellerRequest) (*GetListSellerResponse, error)
 	Update(context.Context, *UpdateSellerRequest) (*UpdateSellerResponse, error)
 	Delete(context.Context, *SellerPrimaryKey) (*SellerEmpty, error)
-	mustEmbedUnimplementedSellerServiceServer()
 }
 
-// UnimplementedSellerServiceServer must be embedded to have forward compatible implementations.
+// UnimplementedSellerServiceServer should be embedded to have forward compatible implementations.
 type UnimplementedSellerServiceServer struct {
 }
 
@@ -121,7 +120,6 @@ func (UnimplementedSellerServiceServer) Update(context.Context, *UpdateSellerReq
 func (UnimplementedSellerServiceServer) Delete(context.Context, *SellerPrimaryKey) (*SellerEmpty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
-func (UnimplementedSellerServiceServer) mustEmbedUnimplementedSellerServiceServer() {}
 
 // UnsafeSellerServiceServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to SellerServiceServer will

@@ -91,7 +91,7 @@ func (c *customerServiceClient) Delete(ctx context.Context, in *CustomerPrimaryK
 }
 
 // CustomerServiceServer is the server API for CustomerService service.
-// All implementations must embed UnimplementedCustomerServiceServer
+// All implementations should embed UnimplementedCustomerServiceServer
 // for forward compatibility
 type CustomerServiceServer interface {
 	Create(context.Context, *CreateCustomer) (*CustomerPrimaryKey, error)
@@ -99,10 +99,9 @@ type CustomerServiceServer interface {
 	GetList(context.Context, *GetListCustomerRequest) (*GetListCustomerResponse, error)
 	Update(context.Context, *UpdateCustomerRequest) (*UpdateCustomerResponse, error)
 	Delete(context.Context, *CustomerPrimaryKey) (*Empty, error)
-	mustEmbedUnimplementedCustomerServiceServer()
 }
 
-// UnimplementedCustomerServiceServer must be embedded to have forward compatible implementations.
+// UnimplementedCustomerServiceServer should be embedded to have forward compatible implementations.
 type UnimplementedCustomerServiceServer struct {
 }
 
@@ -121,7 +120,6 @@ func (UnimplementedCustomerServiceServer) Update(context.Context, *UpdateCustome
 func (UnimplementedCustomerServiceServer) Delete(context.Context, *CustomerPrimaryKey) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
-func (UnimplementedCustomerServiceServer) mustEmbedUnimplementedCustomerServiceServer() {}
 
 // UnsafeCustomerServiceServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to CustomerServiceServer will

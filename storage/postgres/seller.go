@@ -22,9 +22,9 @@ func NewSellerRepo(db *pgxpool.Pool) storage.SellerRepoI {
 	}
 }
 
-func (c *sellerRepo) Create(ctx context.Context, req *ct.CreateSeller) (resp *ct.SellerPrimaryKey, err error) {
+func (c *sellerRepo) Create(ctx context.Context, req *ct.CreateSeller) (*ct.SellerPrimaryKey, error) {
 	id := uuid.NewString()
-	resp = &ct.SellerPrimaryKey{Id: id}
+	resp := &ct.SellerPrimaryKey{Id: id}
 
 	query := `INSERT INTO seller (
 			phone,
@@ -42,7 +42,7 @@ func (c *sellerRepo) Create(ctx context.Context, req *ct.CreateSeller) (resp *ct
 				$6,
 				NOW()
 			)`
-	_, err = c.db.Exec(ctx, query, req.Phone, req.Gmail, req.Name, &req.DateOfBirth, req.ShopId, id)
+	_, err := c.db.Exec(ctx, query, req.Phone, req.Gmail, req.Name, &req.DateOfBirth, req.ShopId, id)
 	if err != nil {
 		log.Println("error while creating seller")
 		return nil, err
@@ -52,8 +52,8 @@ func (c *sellerRepo) Create(ctx context.Context, req *ct.CreateSeller) (resp *ct
 }
 
 
-func (c *sellerRepo) GetByID(ctx context.Context, req *ct.SellerPrimaryKey) (resp *ct.Seller, err error) {
-	resp = &ct.Seller{}
+func (c *sellerRepo) GetByID(ctx context.Context, req *ct.SellerPrimaryKey) (*ct.Seller, error) {
+	resp := &ct.Seller{}
 	query := `SELECT id,
 				   phone,
 				   gmail,
@@ -87,8 +87,8 @@ func (c *sellerRepo) GetByID(ctx context.Context, req *ct.SellerPrimaryKey) (res
 	return resp, nil
 }
 
-func (c *sellerRepo) Update(ctx context.Context, req *ct.UpdateSellerRequest) (resp *ct.UpdateSellerResponse, err error) {
-	resp = &ct.UpdateSellerResponse{Message: "Seller updated successfully"}
+func (c *sellerRepo) Update(ctx context.Context, req *ct.UpdateSellerRequest) (*ct.UpdateSellerResponse, error) {
+	resp := &ct.UpdateSellerResponse{Message: "Seller updated successfully"}
 	query := `UPDATE seller SET phone=$1,
 								 gmail=$2,
 								 name=$3,
@@ -96,7 +96,7 @@ func (c *sellerRepo) Update(ctx context.Context, req *ct.UpdateSellerRequest) (r
 								 shop_id=$5,
 								 updated_at=NOW()
 								 WHERE id=$6 AND deleted_at is null`
-	_, err = c.db.Exec(ctx, query, req.Phone, req.Gmail, req.Name, req.DateOfBirth, req.ShopId, req.Id)
+	_, err := c.db.Exec(ctx, query, req.Phone, req.Gmail, req.Name, req.DateOfBirth, req.ShopId, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -105,13 +105,14 @@ func (c *sellerRepo) Update(ctx context.Context, req *ct.UpdateSellerRequest) (r
 }
 
 
-func (c *sellerRepo) Delete(ctx context.Context, req *ct.SellerPrimaryKey) (resp *ct.SellerEmpty, err error) {
+func (c *sellerRepo) Delete(ctx context.Context, req *ct.SellerPrimaryKey) (*ct.SellerEmpty, error) {
+	resp:=&ct.SellerEmpty{}
 	query := `UPDATE seller SET
 							 deleted_at=NOW()
 							 WHERE id=$1 RETURNING created_at`
 
 	var createdAt sql.NullTime
-	err = c.db.QueryRow(ctx, query, req.Id).Scan(&createdAt)
+	err := c.db.QueryRow(ctx, query, req.Id).Scan(&createdAt)
 	if err != nil {
 		return nil, err
 	}
@@ -124,8 +125,8 @@ func (c *sellerRepo) Delete(ctx context.Context, req *ct.SellerPrimaryKey) (resp
 }
 
 
-func (c *sellerRepo) GetList(ctx context.Context,req *ct.GetListSellerRequest) (resp *ct.GetListSellerResponse,err error) {
-	resp = &ct.GetListSellerResponse{}
+func (c *sellerRepo) GetList(ctx context.Context,req *ct.GetListSellerRequest) (*ct.GetListSellerResponse,error) {
+	resp := &ct.GetListSellerResponse{}
 
 	filter := ""
 	offset := (req.Offset - 1) * req.Limit

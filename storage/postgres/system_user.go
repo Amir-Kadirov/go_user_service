@@ -22,9 +22,9 @@ func NewSystemUserRepo(db *pgxpool.Pool) storage.SystemUserRepoI {
 	}
 }
 
-func (c *system_userRepo) Create(ctx context.Context, req *ct.CreateSystemUser) (resp *ct.SystemUserPrimaryKey, err error) {
+func (c *system_userRepo) Create(ctx context.Context, req *ct.CreateSystemUser) (*ct.SystemUserPrimaryKey, error) {
 	id := uuid.NewString()
-	resp = &ct.SystemUserPrimaryKey{Id: id}
+	resp := &ct.SystemUserPrimaryKey{Id: id}
 
 	query := `INSERT INTO system_user (
 			phone,
@@ -41,7 +41,7 @@ func (c *system_userRepo) Create(ctx context.Context, req *ct.CreateSystemUser) 
 				$5,
 				NOW()
 			)`
-	_, err = c.db.Exec(ctx, query, req.Phone, req.Name, req.Gmail, id,req.Role)
+	_, err := c.db.Exec(ctx, query, req.Phone, req.Name, req.Gmail, id,req.Role)
 	if err != nil {
 		log.Println("error while creating system_user")
 		return nil, err
@@ -51,8 +51,8 @@ func (c *system_userRepo) Create(ctx context.Context, req *ct.CreateSystemUser) 
 }
 
 
-func (c *system_userRepo) GetByID(ctx context.Context, req *ct.SystemUserPrimaryKey) (resp *ct.SystemUser, err error) {
-    resp = &ct.SystemUser{}
+func (c *system_userRepo) GetByID(ctx context.Context, req *ct.SystemUserPrimaryKey) (*ct.SystemUser, error) {
+    resp := &ct.SystemUser{}
 
     query := `SELECT phone,
 				name,
@@ -67,7 +67,7 @@ func (c *system_userRepo) GetByID(ctx context.Context, req *ct.SystemUserPrimary
     row := c.db.QueryRow(ctx, query, req.Id)
 
     var createdAt, updatedAt sql.NullTime
-    err = row.Scan(
+    err := row.Scan(
         &resp.Phone,
         &resp.Name,
         &resp.Gmail,
@@ -86,15 +86,15 @@ func (c *system_userRepo) GetByID(ctx context.Context, req *ct.SystemUserPrimary
     return resp, nil
 }
 
-func (c *system_userRepo) Update(ctx context.Context, req *ct.UpdateSystemUserRequest) (resp *ct.UpdateSystemUserResponse, err error) {
-	resp = &ct.UpdateSystemUserResponse{Message: "System User updated successfully"}
+func (c *system_userRepo) Update(ctx context.Context, req *ct.UpdateSystemUserRequest) (*ct.UpdateSystemUserResponse, error) {
+	resp := &ct.UpdateSystemUserResponse{Message: "System User updated successfully"}
 	query := `UPDATE system_user SET  phone=$1,
 								 name=$2,
 								 gmail=$3,
 								 role=$4,
 								 updated_at=NOW()
 								 WHERE id=$5 AND deleted_at is null`
-	_, err = c.db.Exec(ctx, query, req.Phone, req.Name, req.Gmail, req.Role,req.Id)
+	_, err := c.db.Exec(ctx, query, req.Phone, req.Name, req.Gmail, req.Role,req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -103,13 +103,14 @@ func (c *system_userRepo) Update(ctx context.Context, req *ct.UpdateSystemUserRe
 }
 
 
-func (c *system_userRepo) Delete(ctx context.Context, req *ct.SystemUserPrimaryKey) (resp *ct.SystemUserEmpty, err error) {
+func (c *system_userRepo) Delete(ctx context.Context, req *ct.SystemUserPrimaryKey) (*ct.SystemUserEmpty, error) {
+	resp:=&ct.SystemUserEmpty{}
 	query := `UPDATE system_user SET
 							 deleted_at=NOW()
 							 WHERE id=$1 RETURNING created_at`
 
 	var createdAt sql.NullTime
-	err = c.db.QueryRow(ctx, query, req.Id).Scan(&createdAt)
+	err := c.db.QueryRow(ctx, query, req.Id).Scan(&createdAt)
 	if err != nil {
 		return nil, err
 	}
@@ -121,8 +122,8 @@ func (c *system_userRepo) Delete(ctx context.Context, req *ct.SystemUserPrimaryK
 	return resp, nil
 }
 
-func (c *system_userRepo) GetList(ctx context.Context,req *ct.GetListSystemUserRequest) (resp *ct.GetListSystemUserResponse,err error) {
-	resp = &ct.GetListSystemUserResponse{}
+func (c *system_userRepo) GetList(ctx context.Context,req *ct.GetListSystemUserRequest) (*ct.GetListSystemUserResponse,error) {
+	resp := &ct.GetListSystemUserResponse{}
 
 	filter := ""
     offset := (req.Offset - 1) * req.Limit

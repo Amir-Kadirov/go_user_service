@@ -91,7 +91,7 @@ func (c *systemUserServiceClient) Delete(ctx context.Context, in *SystemUserPrim
 }
 
 // SystemUserServiceServer is the server API for SystemUserService service.
-// All implementations must embed UnimplementedSystemUserServiceServer
+// All implementations should embed UnimplementedSystemUserServiceServer
 // for forward compatibility
 type SystemUserServiceServer interface {
 	Create(context.Context, *CreateSystemUser) (*SystemUserPrimaryKey, error)
@@ -99,10 +99,9 @@ type SystemUserServiceServer interface {
 	GetList(context.Context, *GetListSystemUserRequest) (*GetListSystemUserResponse, error)
 	Update(context.Context, *UpdateSystemUserRequest) (*UpdateSystemUserResponse, error)
 	Delete(context.Context, *SystemUserPrimaryKey) (*SystemUserEmpty, error)
-	mustEmbedUnimplementedSystemUserServiceServer()
 }
 
-// UnimplementedSystemUserServiceServer must be embedded to have forward compatible implementations.
+// UnimplementedSystemUserServiceServer should be embedded to have forward compatible implementations.
 type UnimplementedSystemUserServiceServer struct {
 }
 
@@ -121,7 +120,6 @@ func (UnimplementedSystemUserServiceServer) Update(context.Context, *UpdateSyste
 func (UnimplementedSystemUserServiceServer) Delete(context.Context, *SystemUserPrimaryKey) (*SystemUserEmpty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
-func (UnimplementedSystemUserServiceServer) mustEmbedUnimplementedSystemUserServiceServer() {}
 
 // UnsafeSystemUserServiceServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to SystemUserServiceServer will

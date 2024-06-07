@@ -91,7 +91,7 @@ func (c *branchServiceClient) Delete(ctx context.Context, in *BranchPrimaryKey, 
 }
 
 // BranchServiceServer is the server API for BranchService service.
-// All implementations must embed UnimplementedBranchServiceServer
+// All implementations should embed UnimplementedBranchServiceServer
 // for forward compatibility
 type BranchServiceServer interface {
 	Create(context.Context, *CreateBranch) (*BranchPrimaryKey, error)
@@ -99,10 +99,9 @@ type BranchServiceServer interface {
 	GetList(context.Context, *GetListBranchRequest) (*GetListBranchResponse, error)
 	Update(context.Context, *UpdateBranchRequest) (*UpdateBranchResponse, error)
 	Delete(context.Context, *BranchPrimaryKey) (*BranchEmpty, error)
-	mustEmbedUnimplementedBranchServiceServer()
 }
 
-// UnimplementedBranchServiceServer must be embedded to have forward compatible implementations.
+// UnimplementedBranchServiceServer should be embedded to have forward compatible implementations.
 type UnimplementedBranchServiceServer struct {
 }
 
@@ -121,7 +120,6 @@ func (UnimplementedBranchServiceServer) Update(context.Context, *UpdateBranchReq
 func (UnimplementedBranchServiceServer) Delete(context.Context, *BranchPrimaryKey) (*BranchEmpty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
-func (UnimplementedBranchServiceServer) mustEmbedUnimplementedBranchServiceServer() {}
 
 // UnsafeBranchServiceServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to BranchServiceServer will

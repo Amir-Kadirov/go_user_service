@@ -22,9 +22,9 @@ func NewBranchRepo(db *pgxpool.Pool) storage.BranchRepoI {
 	}
 }
 
-func (c *branchRepo) Create(ctx context.Context, req *ct.CreateBranch) (resp *ct.BranchPrimaryKey, err error) {
+func (c *branchRepo) Create(ctx context.Context, req *ct.CreateBranch) (*ct.BranchPrimaryKey, error) {
 	id := uuid.NewString()
-	resp = &ct.BranchPrimaryKey{Id: id}
+	resp := &ct.BranchPrimaryKey{Id: id}
 
 	open := helper.TimeToSecond(req.OpenTime)
 	close := helper.TimeToSecond(req.CloseTime)
@@ -51,7 +51,7 @@ func (c *branchRepo) Create(ctx context.Context, req *ct.CreateBranch) (resp *ct
 				NOW()
 			);
 `
-	_, err = c.db.Exec(ctx, query, req.Phone, req.Name, req.Address, id,
+	_, err := c.db.Exec(ctx, query, req.Phone, req.Name, req.Address, id,
 		open, close, req.Active, req.Location.Longitude, req.Location.Latitude)
 	if err != nil {
 		log.Println("error while creating branch")
@@ -61,8 +61,8 @@ func (c *branchRepo) Create(ctx context.Context, req *ct.CreateBranch) (resp *ct
 	return resp, err
 }
 
-func (c *branchRepo) GetByID(ctx context.Context, req *ct.BranchPrimaryKey) (resp *ct.Branch, err error) {
-	resp = &ct.Branch{}
+func (c *branchRepo) GetByID(ctx context.Context, req *ct.BranchPrimaryKey) (*ct.Branch, error) {
+	resp := &ct.Branch{}
 
 	query := `SELECT phone,
                 name,
@@ -83,7 +83,7 @@ func (c *branchRepo) GetByID(ctx context.Context, req *ct.BranchPrimaryKey) (res
 	var (createdAt, updatedAt sql.NullTime
 		longitude, latitude      float64)
 	var open, close int
-	err = row.Scan(
+	err := row.Scan(
 		&resp.Phone,
 		&resp.Name,
 		&resp.Address,
@@ -109,8 +109,8 @@ func (c *branchRepo) GetByID(ctx context.Context, req *ct.BranchPrimaryKey) (res
 	return resp, nil
 }
 
-func (c *branchRepo) Update(ctx context.Context, req *ct.UpdateBranchRequest) (resp *ct.UpdateBranchResponse, err error) {
-	resp = &ct.UpdateBranchResponse{Message: "Branch updated successfully"}
+func (c *branchRepo) Update(ctx context.Context, req *ct.UpdateBranchRequest) (*ct.UpdateBranchResponse, error) {
+	resp := &ct.UpdateBranchResponse{Message: "Branch updated successfully"}
 	open := helper.TimeToSecond(req.OpenTime)
 	close := helper.TimeToSecond(req.CloseTime)
 
@@ -123,7 +123,7 @@ func (c *branchRepo) Update(ctx context.Context, req *ct.UpdateBranchRequest) (r
 								 location = ST_SetSRID(ST_MakePoint($7, $8), 4326),
 								 updated_at=NOW()
 								 WHERE id=$9 AND deleted_at is null`
-	_, err = c.db.Exec(ctx, query, req.Phone, req.Name, req.Address, open, close, req.Active, 
+	_, err := c.db.Exec(ctx, query, req.Phone, req.Name, req.Address, open, close, req.Active, 
 		req.Location.Longitude,req.Location.Latitude, req.Id)
 	if err != nil {
 		return nil, err
@@ -132,13 +132,14 @@ func (c *branchRepo) Update(ctx context.Context, req *ct.UpdateBranchRequest) (r
 	return resp, nil
 }
 
-func (c *branchRepo) Delete(ctx context.Context, req *ct.BranchPrimaryKey) (resp *ct.BranchEmpty, err error) {
+func (c *branchRepo) Delete(ctx context.Context, req *ct.BranchPrimaryKey) (*ct.BranchEmpty, error) {
+	resp:=&ct.BranchEmpty{}
 	query := `UPDATE branch SET
 							 deleted_at=NOW()
 							 WHERE id=$1 RETURNING created_at`
 
 	var createdAt sql.NullTime
-	err = c.db.QueryRow(ctx, query, req.Id).Scan(&createdAt)
+	err := c.db.QueryRow(ctx, query, req.Id).Scan(&createdAt)
 	if err != nil {
 		return nil, err
 	}
@@ -150,8 +151,8 @@ func (c *branchRepo) Delete(ctx context.Context, req *ct.BranchPrimaryKey) (resp
 	return resp, nil
 }
 
-func (c *branchRepo) GetList(ctx context.Context, req *ct.GetListBranchRequest) (resp *ct.GetListBranchResponse, err error) {
-	resp = &ct.GetListBranchResponse{}
+func (c *branchRepo) GetList(ctx context.Context, req *ct.GetListBranchRequest) (*ct.GetListBranchResponse, error) {
+	resp := &ct.GetListBranchResponse{}
 
 	filter := ""
 	offset := (req.Offset - 1) * req.Limit

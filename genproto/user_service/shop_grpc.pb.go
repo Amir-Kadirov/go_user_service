@@ -91,7 +91,7 @@ func (c *shopServiceClient) Delete(ctx context.Context, in *ShopPrimaryKey, opts
 }
 
 // ShopServiceServer is the server API for ShopService service.
-// All implementations must embed UnimplementedShopServiceServer
+// All implementations should embed UnimplementedShopServiceServer
 // for forward compatibility
 type ShopServiceServer interface {
 	Create(context.Context, *CreateShop) (*ShopPrimaryKey, error)
@@ -99,10 +99,9 @@ type ShopServiceServer interface {
 	GetList(context.Context, *GetListShopRequest) (*GetListShopResponse, error)
 	Update(context.Context, *UpdateShopRequest) (*ShopEmpty, error)
 	Delete(context.Context, *ShopPrimaryKey) (*ShopEmpty, error)
-	mustEmbedUnimplementedShopServiceServer()
 }
 
-// UnimplementedShopServiceServer must be embedded to have forward compatible implementations.
+// UnimplementedShopServiceServer should be embedded to have forward compatible implementations.
 type UnimplementedShopServiceServer struct {
 }
 
@@ -121,7 +120,6 @@ func (UnimplementedShopServiceServer) Update(context.Context, *UpdateShopRequest
 func (UnimplementedShopServiceServer) Delete(context.Context, *ShopPrimaryKey) (*ShopEmpty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
-func (UnimplementedShopServiceServer) mustEmbedUnimplementedShopServiceServer() {}
 
 // UnsafeShopServiceServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to ShopServiceServer will

@@ -16,7 +16,6 @@ type ShopService struct {
 	log      logger.LoggerI
 	strg     storage.StorageI
 	services client.ServiceManagerI
-	*user_service.UnimplementedShopServiceServer
 }
 
 func NewShopService(cfg config.Config, log logger.LoggerI, strg storage.StorageI, srvs client.ServiceManagerI) *ShopService {
@@ -27,11 +26,11 @@ func NewShopService(cfg config.Config, log logger.LoggerI, strg storage.StorageI
 		services: srvs,
 	}
 }
-func (c *ShopService) Create(ctx context.Context, req *user_service.CreateShop) (resp *user_service.ShopPrimaryKey, err error) {
+func (c *ShopService) Create(ctx context.Context, req *user_service.CreateShop) (*user_service.ShopPrimaryKey, error) {
 
 	c.log.Info("---CreateShop--->>>", logger.Any("req", req))
 
-	resp, err = c.strg.Shop().Create(ctx, req)
+	resp,err := c.strg.Shop().Create(ctx, req)
 	if err != nil {
 		c.log.Error("---CreateShop--->>>", logger.Error(err))
 		return nil, err
@@ -40,11 +39,11 @@ func (c *ShopService) Create(ctx context.Context, req *user_service.CreateShop) 
 	return resp, nil
 }
 
-func (c *ShopService) GetById(ctx context.Context, req *user_service.ShopPrimaryKey) (resp *user_service.GetByID,err error) {
+func (c *ShopService) GetById(ctx context.Context, req *user_service.ShopPrimaryKey) (*user_service.GetByID,error) {
 	fmt.Println("herreee")
 	c.log.Info("---GetByIdShop--->>>", logger.Any("req", req))
 
-	resp, err = c.strg.Shop().GetById(ctx, req)
+	resp,err := c.strg.Shop().GetById(ctx, req)
 	if err != nil {
 		c.log.Error("---GetByIdShop--->>>", logger.Error(err))
 		return nil, err
@@ -53,10 +52,10 @@ func (c *ShopService) GetById(ctx context.Context, req *user_service.ShopPrimary
 	return resp, nil
 }
 
-func (c *ShopService) GetList(ctx context.Context, req *user_service.GetListShopRequest) (resp *user_service.GetListShopResponse, err error) {
+func (c *ShopService) GetList(ctx context.Context, req *user_service.GetListShopRequest) (*user_service.GetListShopResponse, error) {
 	c.log.Info("---GetAllShop--->>>", logger.Any("req", req))
 
-	resp, err = c.strg.Shop().GetList(ctx, req)
+	resp,err := c.strg.Shop().GetList(ctx, req)
 	if err != nil {
 		c.log.Error("---GetAllShop--->>>", logger.Error(err))
 		return nil, err
@@ -65,10 +64,10 @@ func (c *ShopService) GetList(ctx context.Context, req *user_service.GetListShop
 	return resp, nil
 }
 
-func (c *ShopService) Update(ctx context.Context,req *user_service.UpdateShopRequest) (resp *user_service.ShopEmpty,err error) {
+func (c *ShopService) Update(ctx context.Context,req *user_service.UpdateShopRequest) (*user_service.ShopEmpty,error) {
 	c.log.Info("---UpdateShop--->>>", logger.Any("req", req))
 
-	resp, err = c.strg.Shop().Update(ctx, req)
+	resp,err := c.strg.Shop().Update(ctx, req)
 	if err != nil {
 		c.log.Error("---UpdateShop--->>>", logger.Error(err))
 		return nil, err
@@ -77,10 +76,10 @@ func (c *ShopService) Update(ctx context.Context,req *user_service.UpdateShopReq
 	return resp, nil
 }
 
-func (c *ShopService) Delete(ctx context.Context,req *user_service.ShopPrimaryKey) (resp *user_service.ShopEmpty,err error) {
+func (c *ShopService) Delete(ctx context.Context,req *user_service.ShopPrimaryKey) (*user_service.ShopEmpty,error) {
 	c.log.Info("---DeleteShop--->>>", logger.Any("req", req))
 
-	resp, err = c.strg.Shop().Delete(ctx, req)
+	resp,err := c.strg.Shop().Delete(ctx, req)
 	if err != nil {
 		c.log.Error("---DeleteShop--->>>", logger.Error(err))
 		return nil, err

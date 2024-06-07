@@ -24,9 +24,9 @@ func NewShopRepo(db *pgxpool.Pool) storage.ShopRepoI {
 	}
 }
 
-func (c *shopRepo) 	Create(ctx context.Context,req *ct.CreateShop) (resp *ct.ShopPrimaryKey,err error){
+func (c *shopRepo) 	Create(ctx context.Context,req *ct.CreateShop) (*ct.ShopPrimaryKey,error){
 	id := uuid.NewString()
-	resp = &ct.ShopPrimaryKey{Id: id}
+	resp := &ct.ShopPrimaryKey{Id: id}
 	slug:=slug.Make(req.NameEn)
 
 	query := `INSERT INTO shop (
@@ -57,7 +57,7 @@ func (c *shopRepo) 	Create(ctx context.Context,req *ct.CreateShop) (resp *ct.Sho
 				$12,
 				NOW()
 			)`
-	_, err = c.db.Exec(ctx, query, slug, req.Phone, req.NameUz, req.NameRu, req.NameEn, req.DescriptionUz,
+	_, err := c.db.Exec(ctx, query, slug, req.Phone, req.NameUz, req.NameRu, req.NameEn, req.DescriptionUz,
 					   req.DescriptionRu,req.DescriptionEn,req.Location,req.Currency,pq.Array(req.PaymentTypes),id)
 	if err != nil { 
 		log.Println("error while creating customer")
@@ -67,8 +67,8 @@ func (c *shopRepo) 	Create(ctx context.Context,req *ct.CreateShop) (resp *ct.Sho
 	return resp, err
 }
 
-func (c *shopRepo) GetById(ctx context.Context, req *ct.ShopPrimaryKey) (resp *ct.GetByID,err error) {
-	resp=&ct.GetByID{}
+func (c *shopRepo) GetById(ctx context.Context, req *ct.ShopPrimaryKey) (*ct.GetByID,error) {
+	resp:=&ct.GetByID{}
 	
 	query:=`SELECT 
 			slug,
@@ -89,7 +89,7 @@ func (c *shopRepo) GetById(ctx context.Context, req *ct.ShopPrimaryKey) (resp *c
 
 	row:=c.db.QueryRow(ctx,query,req.Id)
 	var createdAt,updatedAt sql.NullTime
-	if err=row.Scan(
+	if err:=row.Scan(
 		&resp.Slug,
 		&resp.Phone,
 		&resp.NameUz,
@@ -112,8 +112,8 @@ func (c *shopRepo) GetById(ctx context.Context, req *ct.ShopPrimaryKey) (resp *c
 }
 
 
-func (c *shopRepo) Update(ctx context.Context, req *ct.UpdateShopRequest) (resp *ct.ShopEmpty, err error) {
-	resp = &ct.ShopEmpty{}
+func (c *shopRepo) Update(ctx context.Context, req *ct.UpdateShopRequest) (*ct.ShopEmpty, error) {
+	resp := &ct.ShopEmpty{}
 	query := `UPDATE shop SET 	phone=$1,
 								name_uz=$2,
 								name_ru=$3,
@@ -126,7 +126,7 @@ func (c *shopRepo) Update(ctx context.Context, req *ct.UpdateShopRequest) (resp 
 								payment_types=$10,
 								 updated_at=NOW()
 								 WHERE id=$11 AND deleted_at is null`
-	_, err = c.db.Exec(ctx, query, req.Phone, req.NameUz, req.NameRu, req.NameEn, req.DescriptionUz,
+	_, err := c.db.Exec(ctx, query, req.Phone, req.NameUz, req.NameRu, req.NameEn, req.DescriptionUz,
 									req.DescriptionRu,req.DescriptionEn,req.Location,req.Currency,pq.Array(req.PaymentTypes),req.Id)
 	if err != nil {
 		return nil, err
@@ -135,13 +135,14 @@ func (c *shopRepo) Update(ctx context.Context, req *ct.UpdateShopRequest) (resp 
 	return resp, nil
 }
 
-func (c *shopRepo) Delete(ctx context.Context,req *ct.ShopPrimaryKey) (resp *ct.ShopEmpty,err error) {
+func (c *shopRepo) Delete(ctx context.Context,req *ct.ShopPrimaryKey) (*ct.ShopEmpty,error) {
+	resp:=&ct.ShopEmpty{}
 	query := `UPDATE shop SET
 							 deleted_at=NOW()
 							 WHERE id=$1 RETURNING created_at`
 
 	var createdAt sql.NullTime
-	err = c.db.QueryRow(ctx, query, req.Id).Scan(&createdAt)
+	err := c.db.QueryRow(ctx, query, req.Id).Scan(&createdAt)
 	if err != nil {
 		return nil, err
 	}
@@ -153,8 +154,8 @@ func (c *shopRepo) Delete(ctx context.Context,req *ct.ShopPrimaryKey) (resp *ct.
 	return resp, nil
 }
 
-func (c *shopRepo) GetList(ctx context.Context,req *ct.GetListShopRequest) (resp *ct.GetListShopResponse,err error) {
-	resp = &ct.GetListShopResponse{}
+func (c *shopRepo) GetList(ctx context.Context,req *ct.GetListShopRequest) (*ct.GetListShopResponse,error) {
+	resp := &ct.GetListShopResponse{}
 	shop := &ct.Shop{}
 
 	filter := ""
