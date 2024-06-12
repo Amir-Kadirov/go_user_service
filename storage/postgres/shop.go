@@ -60,11 +60,11 @@ func (c *shopRepo) 	Create(ctx context.Context,req *ct.CreateShop) (*ct.ShopPrim
 	_, err := c.db.Exec(ctx, query, slug, req.Phone, req.NameUz, req.NameRu, req.NameEn, req.DescriptionUz,
 					   req.DescriptionRu,req.DescriptionEn,req.Location,req.Currency,pq.Array(req.PaymentTypes),id)
 	if err != nil { 
-		log.Println("error while creating customer")
+		log.Println("error while creating shop")
 		return nil, err
 	}
 
-	return resp, err
+	return resp, nil
 }
 
 func (c *shopRepo) GetById(ctx context.Context, req *ct.ShopPrimaryKey) (*ct.GetByID,error) {
@@ -139,7 +139,7 @@ func (c *shopRepo) Delete(ctx context.Context,req *ct.ShopPrimaryKey) (*ct.ShopE
 	resp:=&ct.ShopEmpty{}
 	query := `UPDATE shop SET
 							 deleted_at=NOW()
-							 WHERE id=$1 RETURNING created_at`
+							 WHERE id=$1 AND deleted_at is null RETURNING created_at`
 
 	var createdAt sql.NullTime
 	err := c.db.QueryRow(ctx, query, req.Id).Scan(&createdAt)

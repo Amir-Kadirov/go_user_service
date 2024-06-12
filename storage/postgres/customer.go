@@ -166,7 +166,7 @@ func (c *customerRepo) Delete(ctx context.Context, req *ct.CustomerPrimaryKey) (
 	resp:=&ct.Empty{}
 	query := `UPDATE customers SET
 							 deleted_at=NOW()
-							 WHERE id=$1 RETURNING created_at`
+							 WHERE id=$1 AND deleted_at is null RETURNING created_at`
 
 	var createdAt sql.NullTime
 	err := c.db.QueryRow(ctx, query, req.Id).Scan(&createdAt)
