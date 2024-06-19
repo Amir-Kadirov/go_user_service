@@ -20,6 +20,7 @@ type CustomerRepoI interface {
 	GetList(ctx context.Context, req *ct.GetListCustomerRequest) (resp *ct.GetListCustomerResponse, err error)
 	Update(ctx context.Context,req *ct.UpdateCustomerRequest) (resp *ct.UpdateCustomerResponse,err error)
 	Delete(ctx context.Context,req *ct.CustomerPrimaryKey) (resp *ct.Empty,err error)
+	GetByGmail(ctx context.Context,req *ct.CustomerGmail) (*ct.CustomerPrimaryKey,error)
 }
 
 type ShopRepoI interface{
@@ -36,6 +37,7 @@ type SellerRepoI interface{
 	Update(ctx context.Context, req *ct.UpdateSellerRequest) (resp *ct.UpdateSellerResponse, err error)
 	Delete(ctx context.Context, req *ct.SellerPrimaryKey) (resp *ct.SellerEmpty, err error)
 	GetList(ctx context.Context,req *ct.GetListSellerRequest) (resp *ct.GetListSellerResponse,err error)
+	GetByGmail(ctx context.Context,req *ct.SellerGmail) (*ct.SellerPrimaryKey,error)
 }
 
 type BranchRepoI interface{
@@ -52,4 +54,5 @@ type SystemUserRepoI interface{
 	Update(ctx context.Context, req *ct.UpdateSystemUserRequest) (resp *ct.UpdateSystemUserResponse, err error)
 	Delete(ctx context.Context, req *ct.SystemUserPrimaryKey) (resp *ct.SystemUserEmpty, err error)
 	GetList(ctx context.Context,req *ct.GetListSystemUserRequest) (resp *ct.GetListSystemUserResponse,err error)
+	GetByGmail(ctx context.Context,req *ct.SystemUserGmail) (*ct.SystemUserPrimaryKey,error)
 }

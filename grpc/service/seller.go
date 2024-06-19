@@ -85,3 +85,15 @@ func (c *SellerService) Delete(ctx context.Context,req *user_service.SellerPrima
 
 	return resp, nil
 }
+
+func (c *SellerService) GetByGmail(ctx context.Context,req *user_service.SellerGmail) (*user_service.SellerPrimaryKey,error) {
+	c.log.Info("---GetByGmailSeller--->>>", logger.Any("req", req))
+
+	resp, err := c.strg.Seller().GetByGmail(ctx, req)
+	if err != nil {
+		c.log.Error("---GetByGmailSeller--->>>", logger.Error(err))
+		return nil, err
+	}
+
+	return resp, nil
+}

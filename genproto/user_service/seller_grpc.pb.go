@@ -19,11 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	SellerService_Create_FullMethodName  = "/user_service.SellerService/Create"
-	SellerService_GetByID_FullMethodName = "/user_service.SellerService/GetByID"
-	SellerService_GetList_FullMethodName = "/user_service.SellerService/GetList"
-	SellerService_Update_FullMethodName  = "/user_service.SellerService/Update"
-	SellerService_Delete_FullMethodName  = "/user_service.SellerService/Delete"
+	SellerService_Create_FullMethodName     = "/user_service.SellerService/Create"
+	SellerService_GetByID_FullMethodName    = "/user_service.SellerService/GetByID"
+	SellerService_GetList_FullMethodName    = "/user_service.SellerService/GetList"
+	SellerService_Update_FullMethodName     = "/user_service.SellerService/Update"
+	SellerService_Delete_FullMethodName     = "/user_service.SellerService/Delete"
+	SellerService_GetByGmail_FullMethodName = "/user_service.SellerService/GetByGmail"
 )
 
 // SellerServiceClient is the client API for SellerService service.
@@ -35,6 +36,7 @@ type SellerServiceClient interface {
 	GetList(ctx context.Context, in *GetListSellerRequest, opts ...grpc.CallOption) (*GetListSellerResponse, error)
 	Update(ctx context.Context, in *UpdateSellerRequest, opts ...grpc.CallOption) (*UpdateSellerResponse, error)
 	Delete(ctx context.Context, in *SellerPrimaryKey, opts ...grpc.CallOption) (*SellerEmpty, error)
+	GetByGmail(ctx context.Context, in *SellerGmail, opts ...grpc.CallOption) (*SellerPrimaryKey, error)
 }
 
 type sellerServiceClient struct {
@@ -90,6 +92,15 @@ func (c *sellerServiceClient) Delete(ctx context.Context, in *SellerPrimaryKey, 
 	return out, nil
 }
 
+func (c *sellerServiceClient) GetByGmail(ctx context.Context, in *SellerGmail, opts ...grpc.CallOption) (*SellerPrimaryKey, error) {
+	out := new(SellerPrimaryKey)
+	err := c.cc.Invoke(ctx, SellerService_GetByGmail_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SellerServiceServer is the server API for SellerService service.
 // All implementations should embed UnimplementedSellerServiceServer
 // for forward compatibility
@@ -99,6 +110,7 @@ type SellerServiceServer interface {
 	GetList(context.Context, *GetListSellerRequest) (*GetListSellerResponse, error)
 	Update(context.Context, *UpdateSellerRequest) (*UpdateSellerResponse, error)
 	Delete(context.Context, *SellerPrimaryKey) (*SellerEmpty, error)
+	GetByGmail(context.Context, *SellerGmail) (*SellerPrimaryKey, error)
 }
 
 // UnimplementedSellerServiceServer should be embedded to have forward compatible implementations.
@@ -119,6 +131,9 @@ func (UnimplementedSellerServiceServer) Update(context.Context, *UpdateSellerReq
 }
 func (UnimplementedSellerServiceServer) Delete(context.Context, *SellerPrimaryKey) (*SellerEmpty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedSellerServiceServer) GetByGmail(context.Context, *SellerGmail) (*SellerPrimaryKey, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetByGmail not implemented")
 }
 
 // UnsafeSellerServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -222,6 +237,24 @@ func _SellerService_Delete_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SellerService_GetByGmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SellerGmail)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SellerServiceServer).GetByGmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SellerService_GetByGmail_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SellerServiceServer).GetByGmail(ctx, req.(*SellerGmail))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SellerService_ServiceDesc is the grpc.ServiceDesc for SellerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -248,6 +281,10 @@ var SellerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Delete",
 			Handler:    _SellerService_Delete_Handler,
+		},
+		{
+			MethodName: "GetByGmail",
+			Handler:    _SellerService_GetByGmail_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

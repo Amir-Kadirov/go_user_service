@@ -85,3 +85,15 @@ func (c *SystemUserService) Delete(ctx context.Context,req *user_service.SystemU
 
 	return resp, nil
 }
+
+func (c *SystemUserService) GetByGmail(ctx context.Context,req *user_service.SystemUserGmail) (*user_service.SystemUserPrimaryKey,error) {
+	c.log.Info("---GetByGmailSystemUser--->>>", logger.Any("req", req))
+
+	resp, err := c.strg.SystemUser().GetByGmail(ctx, req)
+	if err != nil {
+		c.log.Error("---GetByGmailSystemUser--->>>", logger.Error(err))
+		return nil, err
+	}
+
+	return resp, nil
+}

@@ -181,3 +181,13 @@ func (c *customerRepo) Delete(ctx context.Context, req *ct.CustomerPrimaryKey) (
 	return resp, nil
 }
 
+func (c *customerRepo) GetByGmail(ctx context.Context,req *ct.CustomerGmail) (*ct.CustomerPrimaryKey,error) {
+	query:=`SELECT id FROM customers WHERE gmail=$1`
+	var id string
+	err:=c.db.QueryRow(ctx,query,req.Gmail).Scan(&id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ct.CustomerPrimaryKey{Id: id},nil	
+}

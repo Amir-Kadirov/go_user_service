@@ -183,3 +183,14 @@ func (c *sellerRepo) GetList(ctx context.Context,req *ct.GetListSellerRequest) (
 
 	return resp, nil
 }
+
+func (c *sellerRepo) GetByGmail(ctx context.Context,req *ct.SellerGmail) (*ct.SellerPrimaryKey,error) {
+	query:=`SELECT id FROM seller WHERE gmail=$1`
+	var id string
+	err:=c.db.QueryRow(ctx,query,req.Gmail).Scan(&id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ct.SellerPrimaryKey{Id: id},nil
+}

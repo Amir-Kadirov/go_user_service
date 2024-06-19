@@ -38,7 +38,7 @@ type SystemUserAuthClient interface {
 	SystemUserLoginByPassword(ctx context.Context, in *SystemUserLoginRequest, opts ...grpc.CallOption) (*SystemUserLoginResponse, error)
 	SystemUserGmailCheck(ctx context.Context, in *SystemUserGmailCheckRequest, opts ...grpc.CallOption) (*SystemUserGmailCheckResponse, error)
 	SystemUserRegisterByMail(ctx context.Context, in *SystemUserGmailCheckRequest, opts ...grpc.CallOption) (*SystemUserEmpty, error)
-	SystemUserRegisterByMailConfirm(ctx context.Context, in *SystemUserRConfirm, opts ...grpc.CallOption) (*SystemUserEmpty, error)
+	SystemUserRegisterByMailConfirm(ctx context.Context, in *SystemUserRConfirm, opts ...grpc.CallOption) (*RespRegSeller, error)
 	SystemUserCreate(ctx context.Context, in *SystemUserCreateRequest, opts ...grpc.CallOption) (*SystemUserEmpty, error)
 	SystemUserLoginByGmail(ctx context.Context, in *SystemUserGmailCheckRequest, opts ...grpc.CallOption) (*SystemUserEmpty, error)
 	SystemUserLoginByGmailComfirm(ctx context.Context, in *SystemUserLoginByGmailRequest, opts ...grpc.CallOption) (*SystemUserLoginResponse, error)
@@ -82,8 +82,8 @@ func (c *systemUserAuthClient) SystemUserRegisterByMail(ctx context.Context, in 
 	return out, nil
 }
 
-func (c *systemUserAuthClient) SystemUserRegisterByMailConfirm(ctx context.Context, in *SystemUserRConfirm, opts ...grpc.CallOption) (*SystemUserEmpty, error) {
-	out := new(SystemUserEmpty)
+func (c *systemUserAuthClient) SystemUserRegisterByMailConfirm(ctx context.Context, in *SystemUserRConfirm, opts ...grpc.CallOption) (*RespRegSeller, error) {
+	out := new(RespRegSeller)
 	err := c.cc.Invoke(ctx, SystemUserAuth_SystemUserRegisterByMailConfirm_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -152,7 +152,7 @@ type SystemUserAuthServer interface {
 	SystemUserLoginByPassword(context.Context, *SystemUserLoginRequest) (*SystemUserLoginResponse, error)
 	SystemUserGmailCheck(context.Context, *SystemUserGmailCheckRequest) (*SystemUserGmailCheckResponse, error)
 	SystemUserRegisterByMail(context.Context, *SystemUserGmailCheckRequest) (*SystemUserEmpty, error)
-	SystemUserRegisterByMailConfirm(context.Context, *SystemUserRConfirm) (*SystemUserEmpty, error)
+	SystemUserRegisterByMailConfirm(context.Context, *SystemUserRConfirm) (*RespRegSeller, error)
 	SystemUserCreate(context.Context, *SystemUserCreateRequest) (*SystemUserEmpty, error)
 	SystemUserLoginByGmail(context.Context, *SystemUserGmailCheckRequest) (*SystemUserEmpty, error)
 	SystemUserLoginByGmailComfirm(context.Context, *SystemUserLoginByGmailRequest) (*SystemUserLoginResponse, error)
@@ -174,7 +174,7 @@ func (UnimplementedSystemUserAuthServer) SystemUserGmailCheck(context.Context, *
 func (UnimplementedSystemUserAuthServer) SystemUserRegisterByMail(context.Context, *SystemUserGmailCheckRequest) (*SystemUserEmpty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SystemUserRegisterByMail not implemented")
 }
-func (UnimplementedSystemUserAuthServer) SystemUserRegisterByMailConfirm(context.Context, *SystemUserRConfirm) (*SystemUserEmpty, error) {
+func (UnimplementedSystemUserAuthServer) SystemUserRegisterByMailConfirm(context.Context, *SystemUserRConfirm) (*RespRegSeller, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SystemUserRegisterByMailConfirm not implemented")
 }
 func (UnimplementedSystemUserAuthServer) SystemUserCreate(context.Context, *SystemUserCreateRequest) (*SystemUserEmpty, error) {

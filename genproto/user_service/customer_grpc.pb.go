@@ -19,11 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	CustomerService_Create_FullMethodName  = "/user_service.CustomerService/Create"
-	CustomerService_GetByID_FullMethodName = "/user_service.CustomerService/GetByID"
-	CustomerService_GetList_FullMethodName = "/user_service.CustomerService/GetList"
-	CustomerService_Update_FullMethodName  = "/user_service.CustomerService/Update"
-	CustomerService_Delete_FullMethodName  = "/user_service.CustomerService/Delete"
+	CustomerService_Create_FullMethodName     = "/user_service.CustomerService/Create"
+	CustomerService_GetByID_FullMethodName    = "/user_service.CustomerService/GetByID"
+	CustomerService_GetList_FullMethodName    = "/user_service.CustomerService/GetList"
+	CustomerService_Update_FullMethodName     = "/user_service.CustomerService/Update"
+	CustomerService_Delete_FullMethodName     = "/user_service.CustomerService/Delete"
+	CustomerService_GetByGmail_FullMethodName = "/user_service.CustomerService/GetByGmail"
 )
 
 // CustomerServiceClient is the client API for CustomerService service.
@@ -35,6 +36,7 @@ type CustomerServiceClient interface {
 	GetList(ctx context.Context, in *GetListCustomerRequest, opts ...grpc.CallOption) (*GetListCustomerResponse, error)
 	Update(ctx context.Context, in *UpdateCustomerRequest, opts ...grpc.CallOption) (*UpdateCustomerResponse, error)
 	Delete(ctx context.Context, in *CustomerPrimaryKey, opts ...grpc.CallOption) (*Empty, error)
+	GetByGmail(ctx context.Context, in *CustomerGmail, opts ...grpc.CallOption) (*CustomerPrimaryKey, error)
 }
 
 type customerServiceClient struct {
@@ -90,6 +92,15 @@ func (c *customerServiceClient) Delete(ctx context.Context, in *CustomerPrimaryK
 	return out, nil
 }
 
+func (c *customerServiceClient) GetByGmail(ctx context.Context, in *CustomerGmail, opts ...grpc.CallOption) (*CustomerPrimaryKey, error) {
+	out := new(CustomerPrimaryKey)
+	err := c.cc.Invoke(ctx, CustomerService_GetByGmail_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CustomerServiceServer is the server API for CustomerService service.
 // All implementations should embed UnimplementedCustomerServiceServer
 // for forward compatibility
@@ -99,6 +110,7 @@ type CustomerServiceServer interface {
 	GetList(context.Context, *GetListCustomerRequest) (*GetListCustomerResponse, error)
 	Update(context.Context, *UpdateCustomerRequest) (*UpdateCustomerResponse, error)
 	Delete(context.Context, *CustomerPrimaryKey) (*Empty, error)
+	GetByGmail(context.Context, *CustomerGmail) (*CustomerPrimaryKey, error)
 }
 
 // UnimplementedCustomerServiceServer should be embedded to have forward compatible implementations.
@@ -119,6 +131,9 @@ func (UnimplementedCustomerServiceServer) Update(context.Context, *UpdateCustome
 }
 func (UnimplementedCustomerServiceServer) Delete(context.Context, *CustomerPrimaryKey) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedCustomerServiceServer) GetByGmail(context.Context, *CustomerGmail) (*CustomerPrimaryKey, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetByGmail not implemented")
 }
 
 // UnsafeCustomerServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -222,6 +237,24 @@ func _CustomerService_Delete_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CustomerService_GetByGmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CustomerGmail)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CustomerServiceServer).GetByGmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CustomerService_GetByGmail_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CustomerServiceServer).GetByGmail(ctx, req.(*CustomerGmail))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CustomerService_ServiceDesc is the grpc.ServiceDesc for CustomerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -248,6 +281,10 @@ var CustomerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Delete",
 			Handler:    _CustomerService_Delete_Handler,
+		},
+		{
+			MethodName: "GetByGmail",
+			Handler:    _CustomerService_GetByGmail_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

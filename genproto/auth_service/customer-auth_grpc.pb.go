@@ -38,7 +38,7 @@ type CustomerAuthClient interface {
 	LoginByPassword(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	GmailCheck(ctx context.Context, in *GmailCheckRequest, opts ...grpc.CallOption) (*GmailCheckResponse, error)
 	RegisterByMail(ctx context.Context, in *GmailCheckRequest, opts ...grpc.CallOption) (*Empty, error)
-	RegisterByMailConfirm(ctx context.Context, in *RConfirm, opts ...grpc.CallOption) (*Empty, error)
+	RegisterByMailConfirm(ctx context.Context, in *RConfirm, opts ...grpc.CallOption) (*RegGmailResp, error)
 	Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*Empty, error)
 	LoginByGmail(ctx context.Context, in *GmailCheckRequest, opts ...grpc.CallOption) (*Empty, error)
 	LoginByGmailComfirm(ctx context.Context, in *LoginByGmailRequest, opts ...grpc.CallOption) (*LoginResponse, error)
@@ -82,8 +82,8 @@ func (c *customerAuthClient) RegisterByMail(ctx context.Context, in *GmailCheckR
 	return out, nil
 }
 
-func (c *customerAuthClient) RegisterByMailConfirm(ctx context.Context, in *RConfirm, opts ...grpc.CallOption) (*Empty, error) {
-	out := new(Empty)
+func (c *customerAuthClient) RegisterByMailConfirm(ctx context.Context, in *RConfirm, opts ...grpc.CallOption) (*RegGmailResp, error) {
+	out := new(RegGmailResp)
 	err := c.cc.Invoke(ctx, CustomerAuth_RegisterByMailConfirm_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -152,7 +152,7 @@ type CustomerAuthServer interface {
 	LoginByPassword(context.Context, *LoginRequest) (*LoginResponse, error)
 	GmailCheck(context.Context, *GmailCheckRequest) (*GmailCheckResponse, error)
 	RegisterByMail(context.Context, *GmailCheckRequest) (*Empty, error)
-	RegisterByMailConfirm(context.Context, *RConfirm) (*Empty, error)
+	RegisterByMailConfirm(context.Context, *RConfirm) (*RegGmailResp, error)
 	Create(context.Context, *CreateRequest) (*Empty, error)
 	LoginByGmail(context.Context, *GmailCheckRequest) (*Empty, error)
 	LoginByGmailComfirm(context.Context, *LoginByGmailRequest) (*LoginResponse, error)
@@ -174,7 +174,7 @@ func (UnimplementedCustomerAuthServer) GmailCheck(context.Context, *GmailCheckRe
 func (UnimplementedCustomerAuthServer) RegisterByMail(context.Context, *GmailCheckRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterByMail not implemented")
 }
-func (UnimplementedCustomerAuthServer) RegisterByMailConfirm(context.Context, *RConfirm) (*Empty, error) {
+func (UnimplementedCustomerAuthServer) RegisterByMailConfirm(context.Context, *RConfirm) (*RegGmailResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterByMailConfirm not implemented")
 }
 func (UnimplementedCustomerAuthServer) Create(context.Context, *CreateRequest) (*Empty, error) {

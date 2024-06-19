@@ -178,3 +178,14 @@ func (c *system_userRepo) GetList(ctx context.Context,req *ct.GetListSystemUserR
 
 	return resp, nil
 }
+
+func (c *system_userRepo) GetByGmail(ctx context.Context,req *ct.SystemUserGmail) (*ct.SystemUserPrimaryKey,error) {
+	query:=`SELECT id FROM system_user WHERE gmail=$1`
+	var id string
+	err:=c.db.QueryRow(ctx,query,req.Gmail).Scan(&id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ct.SystemUserPrimaryKey{Id: id},nil	
+}
