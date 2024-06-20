@@ -102,7 +102,7 @@ func (c *customerServiceClient) GetByGmail(ctx context.Context, in *CustomerGmai
 }
 
 // CustomerServiceServer is the server API for CustomerService service.
-// All implementations should embed UnimplementedCustomerServiceServer
+// All implementations must embed UnimplementedCustomerServiceServer
 // for forward compatibility
 type CustomerServiceServer interface {
 	Create(context.Context, *CreateCustomer) (*CustomerPrimaryKey, error)
@@ -111,9 +111,10 @@ type CustomerServiceServer interface {
 	Update(context.Context, *UpdateCustomerRequest) (*UpdateCustomerResponse, error)
 	Delete(context.Context, *CustomerPrimaryKey) (*Empty, error)
 	GetByGmail(context.Context, *CustomerGmail) (*CustomerPrimaryKey, error)
+	mustEmbedUnimplementedCustomerServiceServer()
 }
 
-// UnimplementedCustomerServiceServer should be embedded to have forward compatible implementations.
+// UnimplementedCustomerServiceServer must be embedded to have forward compatible implementations.
 type UnimplementedCustomerServiceServer struct {
 }
 
@@ -135,6 +136,7 @@ func (UnimplementedCustomerServiceServer) Delete(context.Context, *CustomerPrima
 func (UnimplementedCustomerServiceServer) GetByGmail(context.Context, *CustomerGmail) (*CustomerPrimaryKey, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetByGmail not implemented")
 }
+func (UnimplementedCustomerServiceServer) mustEmbedUnimplementedCustomerServiceServer() {}
 
 // UnsafeCustomerServiceServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to CustomerServiceServer will

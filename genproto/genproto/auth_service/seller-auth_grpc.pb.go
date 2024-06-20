@@ -44,7 +44,7 @@ type SellerAuthClient interface {
 	SellerLoginByGmailComfirm(ctx context.Context, in *SellerLoginByGmailRequest, opts ...grpc.CallOption) (*SellerLoginResponse, error)
 	SellerUpdatePassword(ctx context.Context, in *SellerCreateRequest, opts ...grpc.CallOption) (*SellerEmpty, error)
 	SellerResetPassword(ctx context.Context, in *SellerGmailCheckRequest, opts ...grpc.CallOption) (*SellerEmpty, error)
-	SellerResetPasswordConfirm(ctx context.Context, in *SellerRConfirm, opts ...grpc.CallOption) (*SellerEmpty, error)
+	SellerResetPasswordConfirm(ctx context.Context, in *SellerPasswordConfirm, opts ...grpc.CallOption) (*SellerEmpty, error)
 }
 
 type sellerAuthClient struct {
@@ -136,7 +136,7 @@ func (c *sellerAuthClient) SellerResetPassword(ctx context.Context, in *SellerGm
 	return out, nil
 }
 
-func (c *sellerAuthClient) SellerResetPasswordConfirm(ctx context.Context, in *SellerRConfirm, opts ...grpc.CallOption) (*SellerEmpty, error) {
+func (c *sellerAuthClient) SellerResetPasswordConfirm(ctx context.Context, in *SellerPasswordConfirm, opts ...grpc.CallOption) (*SellerEmpty, error) {
 	out := new(SellerEmpty)
 	err := c.cc.Invoke(ctx, SellerAuth_SellerResetPasswordConfirm_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -146,7 +146,7 @@ func (c *sellerAuthClient) SellerResetPasswordConfirm(ctx context.Context, in *S
 }
 
 // SellerAuthServer is the server API for SellerAuth service.
-// All implementations should embed UnimplementedSellerAuthServer
+// All implementations must embed UnimplementedSellerAuthServer
 // for forward compatibility
 type SellerAuthServer interface {
 	SellerLoginByPassword(context.Context, *SellerLoginRequest) (*SellerLoginResponse, error)
@@ -158,10 +158,11 @@ type SellerAuthServer interface {
 	SellerLoginByGmailComfirm(context.Context, *SellerLoginByGmailRequest) (*SellerLoginResponse, error)
 	SellerUpdatePassword(context.Context, *SellerCreateRequest) (*SellerEmpty, error)
 	SellerResetPassword(context.Context, *SellerGmailCheckRequest) (*SellerEmpty, error)
-	SellerResetPasswordConfirm(context.Context, *SellerRConfirm) (*SellerEmpty, error)
+	SellerResetPasswordConfirm(context.Context, *SellerPasswordConfirm) (*SellerEmpty, error)
+	mustEmbedUnimplementedSellerAuthServer()
 }
 
-// UnimplementedSellerAuthServer should be embedded to have forward compatible implementations.
+// UnimplementedSellerAuthServer must be embedded to have forward compatible implementations.
 type UnimplementedSellerAuthServer struct {
 }
 
@@ -192,9 +193,10 @@ func (UnimplementedSellerAuthServer) SellerUpdatePassword(context.Context, *Sell
 func (UnimplementedSellerAuthServer) SellerResetPassword(context.Context, *SellerGmailCheckRequest) (*SellerEmpty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SellerResetPassword not implemented")
 }
-func (UnimplementedSellerAuthServer) SellerResetPasswordConfirm(context.Context, *SellerRConfirm) (*SellerEmpty, error) {
+func (UnimplementedSellerAuthServer) SellerResetPasswordConfirm(context.Context, *SellerPasswordConfirm) (*SellerEmpty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SellerResetPasswordConfirm not implemented")
 }
+func (UnimplementedSellerAuthServer) mustEmbedUnimplementedSellerAuthServer() {}
 
 // UnsafeSellerAuthServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to SellerAuthServer will
@@ -370,7 +372,7 @@ func _SellerAuth_SellerResetPassword_Handler(srv interface{}, ctx context.Contex
 }
 
 func _SellerAuth_SellerResetPasswordConfirm_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SellerRConfirm)
+	in := new(SellerPasswordConfirm)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -382,7 +384,7 @@ func _SellerAuth_SellerResetPasswordConfirm_Handler(srv interface{}, ctx context
 		FullMethod: SellerAuth_SellerResetPasswordConfirm_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SellerAuthServer).SellerResetPasswordConfirm(ctx, req.(*SellerRConfirm))
+		return srv.(SellerAuthServer).SellerResetPasswordConfirm(ctx, req.(*SellerPasswordConfirm))
 	}
 	return interceptor(ctx, in, info, handler)
 }

@@ -1,27 +1,30 @@
 #!/bin/bash
 
-# Получаем текущий каталог из первого аргумента
+# Get the current directory from the first argument
 CURRENT_DIR=$1
 
-# Удаляем старые сгенерированные файлы
+# Remove old generated files
 rm -rf "${CURRENT_DIR}/genproto/*"
 
-# Устанавливаем пути к плагинам
+# Create the genproto directory if it doesn't exist
+mkdir -p "${CURRENT_DIR}/genproto"
+
+# Set paths to the plugins
 PROTOC_GEN_GO=$(which protoc-gen-go)
 PROTOC_GEN_GO_GRPC=$(which protoc-gen-go-grpc)
 
-# Проверяем, что плагины найдены
+# Check that plugins are found
 if [[ -z "$PROTOC_GEN_GO" || -z "$PROTOC_GEN_GO_GRPC" ]]; then
   echo "protoc-gen-go or protoc-gen-go-grpc not found in PATH"
   exit 1
 fi
 
-# Генерация кода для каждого подкаталога в папке protos
+# Generate code for each subdirectory in the proto folder
 for x in $(find ${CURRENT_DIR}/proto/* -type d); do
   protoc --plugin="protoc-gen-go=${PROTOC_GEN_GO}" \
          --plugin="protoc-gen-go-grpc=${PROTOC_GEN_GO_GRPC}" \
-         -I=${x} -I=${CURRENT_DIR}/protos -I /usr/local/include \
-         --go_out=${CURRENT_DIR} \
-         --go-grpc_out=require_unimplemented_servers=false:${CURRENT_DIR} \
+         -I=${x} -I=${CURRENT_DIR}/proto -I /usr/local/include \
+         --go_out=${CURRENT_DIR}/genproto \
+         --go-grpc_out=${CURRENT_DIR}/genproto \
          ${x}/*.proto
 done

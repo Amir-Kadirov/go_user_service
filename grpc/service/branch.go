@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"user_service/config"
-	"user_service/genproto/user_service"
+	"user_service/genproto/genproto/user_service"
 	"user_service/grpc/client"
 	"user_service/storage"
 
@@ -11,15 +11,20 @@ import (
 )
 
 type BranchService struct {
+	user_service.UnimplementedBranchServiceServer
 	cfg      config.Config
 	log      logger.LoggerI
 	strg     storage.StorageI
 	services client.ServiceManagerI
 }
 
+// mustEmbedUnimplementedBranchServiceServer implements user_service.BranchServiceServer.
+func (c *BranchService) mustEmbedUnimplementedBranchServiceServer() {
+}
+
 func NewBranchService(cfg config.Config, log logger.LoggerI, strg storage.StorageI, srvs client.ServiceManagerI) *BranchService {
 	return &BranchService{
-		cfg:      cfg,	
+		cfg:      cfg,
 		log:      log,
 		strg:     strg,
 		services: srvs,
@@ -36,7 +41,7 @@ func (c *BranchService) Create(ctx context.Context, req *user_service.CreateBran
 	}
 
 	return resp, nil
-}	
+}
 
 func (c *BranchService) GetByID(ctx context.Context, req *user_service.BranchPrimaryKey) (*user_service.Branch, error) {
 	c.log.Info("---GetByIdBranch--->>>", logger.Any("req", req))
@@ -62,7 +67,7 @@ func (c *BranchService) GetList(ctx context.Context, req *user_service.GetListBr
 	return resp, nil
 }
 
-func (c *BranchService) Update(ctx context.Context,req *user_service.UpdateBranchRequest) (*user_service.UpdateBranchResponse,error) {
+func (c *BranchService) Update(ctx context.Context, req *user_service.UpdateBranchRequest) (*user_service.UpdateBranchResponse, error) {
 	c.log.Info("---UpdateBranch--->>>", logger.Any("req", req))
 
 	resp, err := c.strg.Branch().Update(ctx, req)
@@ -74,7 +79,7 @@ func (c *BranchService) Update(ctx context.Context,req *user_service.UpdateBranc
 	return resp, nil
 }
 
-func (c *BranchService) Delete(ctx context.Context,req *user_service.BranchPrimaryKey) (*user_service.BranchEmpty,error) {
+func (c *BranchService) Delete(ctx context.Context, req *user_service.BranchPrimaryKey) (*user_service.BranchEmpty, error) {
 	c.log.Info("---DeleteBranch--->>>", logger.Any("req", req))
 
 	resp, err := c.strg.Branch().Delete(ctx, req)

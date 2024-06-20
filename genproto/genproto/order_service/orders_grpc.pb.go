@@ -91,7 +91,7 @@ func (c *orderServiceClient) Delete(ctx context.Context, in *OrderPrimaryKey, op
 }
 
 // OrderServiceServer is the server API for OrderService service.
-// All implementations should embed UnimplementedOrderServiceServer
+// All implementations must embed UnimplementedOrderServiceServer
 // for forward compatibility
 type OrderServiceServer interface {
 	Create(context.Context, *CreateOrder) (*Order, error)
@@ -99,9 +99,10 @@ type OrderServiceServer interface {
 	GetAll(context.Context, *GetListOrderRequest) (*GetListOrderResponse, error)
 	Update(context.Context, *UpdateOrder) (*Order, error)
 	Delete(context.Context, *OrderPrimaryKey) (*Empty, error)
+	mustEmbedUnimplementedOrderServiceServer()
 }
 
-// UnimplementedOrderServiceServer should be embedded to have forward compatible implementations.
+// UnimplementedOrderServiceServer must be embedded to have forward compatible implementations.
 type UnimplementedOrderServiceServer struct {
 }
 
@@ -120,6 +121,7 @@ func (UnimplementedOrderServiceServer) Update(context.Context, *UpdateOrder) (*O
 func (UnimplementedOrderServiceServer) Delete(context.Context, *OrderPrimaryKey) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
+func (UnimplementedOrderServiceServer) mustEmbedUnimplementedOrderServiceServer() {}
 
 // UnsafeOrderServiceServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to OrderServiceServer will

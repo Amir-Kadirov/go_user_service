@@ -102,7 +102,7 @@ func (c *productReviewServiceClient) DeleteProductReview(ctx context.Context, in
 }
 
 // ProductReviewServiceServer is the server API for ProductReviewService service.
-// All implementations should embed UnimplementedProductReviewServiceServer
+// All implementations must embed UnimplementedProductReviewServiceServer
 // for forward compatibility
 type ProductReviewServiceServer interface {
 	CreateProductReview(context.Context, *CreateProductReviewRequest) (*ProductReview, error)
@@ -111,9 +111,10 @@ type ProductReviewServiceServer interface {
 	GetProductReviewsByCustomerID(context.Context, *GetProductReviewsByCustomerIDRequest) (*GetProductReviewsByCustomerIDResponse, error)
 	UpdateProductReview(context.Context, *UpdateProductReviewRequest) (*ProductReview, error)
 	DeleteProductReview(context.Context, *ProductReviewPrimaryKey) (*Empty4, error)
+	mustEmbedUnimplementedProductReviewServiceServer()
 }
 
-// UnimplementedProductReviewServiceServer should be embedded to have forward compatible implementations.
+// UnimplementedProductReviewServiceServer must be embedded to have forward compatible implementations.
 type UnimplementedProductReviewServiceServer struct {
 }
 
@@ -135,6 +136,7 @@ func (UnimplementedProductReviewServiceServer) UpdateProductReview(context.Conte
 func (UnimplementedProductReviewServiceServer) DeleteProductReview(context.Context, *ProductReviewPrimaryKey) (*Empty4, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteProductReview not implemented")
 }
+func (UnimplementedProductReviewServiceServer) mustEmbedUnimplementedProductReviewServiceServer() {}
 
 // UnsafeProductReviewServiceServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to ProductReviewServiceServer will

@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"user_service/config"
-	"user_service/genproto/user_service"
+	"user_service/genproto/genproto/user_service"
 	"user_service/grpc/client"
 	"user_service/storage"
 
@@ -11,15 +11,22 @@ import (
 )
 
 type CustomerService struct {
+	user_service.UnimplementedCustomerServiceServer
 	cfg      config.Config
 	log      logger.LoggerI
 	strg     storage.StorageI
 	services client.ServiceManagerI
 }
 
+// mustEmbedUnimplementedCustomerServiceServer implements user_service.CustomerServiceServer.
+func (c *CustomerService) mustEmbedUnimplementedCustomerServiceServer() {
+	panic("unimplemented")
+}
+
+
 func NewCustomerService(cfg config.Config, log logger.LoggerI, strg storage.StorageI, srvs client.ServiceManagerI) *CustomerService {
 	return &CustomerService{
-		cfg:      cfg,	
+		cfg:      cfg,
 		log:      log,
 		strg:     strg,
 		services: srvs,
@@ -36,7 +43,7 @@ func (c *CustomerService) Create(ctx context.Context, req *user_service.CreateCu
 	}
 
 	return resp, nil
-}	
+}
 
 func (c *CustomerService) GetByID(ctx context.Context, req *user_service.CustomerPrimaryKey) (*user_service.Customer, error) {
 	c.log.Info("---GetByIdCustomer--->>>", logger.Any("req", req))
@@ -62,7 +69,7 @@ func (c *CustomerService) GetList(ctx context.Context, req *user_service.GetList
 	return resp, nil
 }
 
-func (c *CustomerService) Update(ctx context.Context,req *user_service.UpdateCustomerRequest) (*user_service.UpdateCustomerResponse,error) {
+func (c *CustomerService) Update(ctx context.Context, req *user_service.UpdateCustomerRequest) (*user_service.UpdateCustomerResponse, error) {
 	c.log.Info("---UpdateCustomer--->>>", logger.Any("req", req))
 
 	resp, err := c.strg.Customer().Update(ctx, req)
@@ -74,7 +81,7 @@ func (c *CustomerService) Update(ctx context.Context,req *user_service.UpdateCus
 	return resp, nil
 }
 
-func (c *CustomerService) Delete(ctx context.Context,req *user_service.CustomerPrimaryKey) (*user_service.Empty,error) {
+func (c *CustomerService) Delete(ctx context.Context, req *user_service.CustomerPrimaryKey) (*user_service.Empty, error) {
 	c.log.Info("---DeleteCustomer--->>>", logger.Any("req", req))
 
 	resp, err := c.strg.Customer().Delete(ctx, req)
@@ -86,7 +93,7 @@ func (c *CustomerService) Delete(ctx context.Context,req *user_service.CustomerP
 	return resp, nil
 }
 
-func (c *CustomerService) GetByGmail(ctx context.Context,req *user_service.CustomerGmail) (*user_service.CustomerPrimaryKey,error) {
+func (c *CustomerService) GetByGmail(ctx context.Context, req *user_service.CustomerGmail) (*user_service.CustomerPrimaryKey, error) {
 	c.log.Info("---GetByGmailCustomer--->>>", logger.Any("req", req))
 
 	resp, err := c.strg.Customer().GetByGmail(ctx, req)

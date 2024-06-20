@@ -91,7 +91,7 @@ func (c *orderStatusNotesClient) Delete(ctx context.Context, in *OrderNotesPrima
 }
 
 // OrderStatusNotesServer is the server API for OrderStatusNotes service.
-// All implementations should embed UnimplementedOrderStatusNotesServer
+// All implementations must embed UnimplementedOrderStatusNotesServer
 // for forward compatibility
 type OrderStatusNotesServer interface {
 	Create(context.Context, *CreateOrderNotes) (*OrderNotes, error)
@@ -99,9 +99,10 @@ type OrderStatusNotesServer interface {
 	GetAll(context.Context, *GetListOrderNotesRequest) (*GetListOrderNotesResponse, error)
 	Update(context.Context, *UpdateOrderNotes) (*OrderNotes, error)
 	Delete(context.Context, *OrderNotesPrimaryKey) (*Empty, error)
+	mustEmbedUnimplementedOrderStatusNotesServer()
 }
 
-// UnimplementedOrderStatusNotesServer should be embedded to have forward compatible implementations.
+// UnimplementedOrderStatusNotesServer must be embedded to have forward compatible implementations.
 type UnimplementedOrderStatusNotesServer struct {
 }
 
@@ -120,6 +121,7 @@ func (UnimplementedOrderStatusNotesServer) Update(context.Context, *UpdateOrderN
 func (UnimplementedOrderStatusNotesServer) Delete(context.Context, *OrderNotesPrimaryKey) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
+func (UnimplementedOrderStatusNotesServer) mustEmbedUnimplementedOrderStatusNotesServer() {}
 
 // UnsafeOrderStatusNotesServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to OrderStatusNotesServer will

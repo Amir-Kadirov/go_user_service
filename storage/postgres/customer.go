@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"log"
-	ct "user_service/genproto/user_service"
+	ct "user_service/genproto/genproto/user_service"
 	"user_service/pkg/helper"
 	"user_service/storage"
 
@@ -90,11 +90,11 @@ func (c *customerRepo) GetList(ctx context.Context, req *ct.GetListCustomerReque
 	resp := &ct.GetListCustomerResponse{}
 
 	filter := ""
-    offset := (req.Offset - 1) * req.Limit
+	offset := (req.Offset - 1) * req.Limit
 
-    if req.Search != "" {
-        filter = ` AND gender ILIKE '%` + req.Search + `%' `
-    }
+	if req.Search != "" {
+		filter = ` AND gender ILIKE '%` + req.Search + `%' `
+	}
 
 	query := `SELECT 
 				id,
@@ -163,7 +163,7 @@ func (c *customerRepo) Update(ctx context.Context, req *ct.UpdateCustomerRequest
 }
 
 func (c *customerRepo) Delete(ctx context.Context, req *ct.CustomerPrimaryKey) (*ct.Empty, error) {
-	resp:=&ct.Empty{}
+	resp := &ct.Empty{}
 	query := `UPDATE customers SET
 							 deleted_at=NOW()
 							 WHERE id=$1 AND deleted_at is null RETURNING created_at`
@@ -174,20 +174,20 @@ func (c *customerRepo) Delete(ctx context.Context, req *ct.CustomerPrimaryKey) (
 		return nil, err
 	}
 
-	if err=helper.DeleteChecker(createdAt);err!=nil {
-		return resp,nil
+	if err = helper.DeleteChecker(createdAt); err != nil {
+		return resp, nil
 	}
 
 	return resp, nil
 }
 
-func (c *customerRepo) GetByGmail(ctx context.Context,req *ct.CustomerGmail) (*ct.CustomerPrimaryKey,error) {
-	query:=`SELECT id FROM customers WHERE gmail=$1`
+func (c *customerRepo) GetByGmail(ctx context.Context, req *ct.CustomerGmail) (*ct.CustomerPrimaryKey, error) {
+	query := `SELECT id FROM customers WHERE gmail=$1`
 	var id string
-	err:=c.db.QueryRow(ctx,query,req.Gmail).Scan(&id)
+	err := c.db.QueryRow(ctx, query, req.Gmail).Scan(&id)
 	if err != nil {
 		return nil, err
 	}
 
-	return &ct.CustomerPrimaryKey{Id: id},nil	
+	return &ct.CustomerPrimaryKey{Id: id}, nil
 }

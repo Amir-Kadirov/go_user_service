@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"log"
-	ct "user_service/genproto/user_service"
+	ct "user_service/genproto/genproto/user_service"
 	"user_service/pkg/helper"
 	"user_service/storage"
 
@@ -50,7 +50,6 @@ func (c *sellerRepo) Create(ctx context.Context, req *ct.CreateSeller) (*ct.Sell
 
 	return resp, err
 }
-
 
 func (c *sellerRepo) GetByID(ctx context.Context, req *ct.SellerPrimaryKey) (*ct.Seller, error) {
 	resp := &ct.Seller{}
@@ -104,9 +103,8 @@ func (c *sellerRepo) Update(ctx context.Context, req *ct.UpdateSellerRequest) (*
 	return resp, nil
 }
 
-
 func (c *sellerRepo) Delete(ctx context.Context, req *ct.SellerPrimaryKey) (*ct.SellerEmpty, error) {
-	resp:=&ct.SellerEmpty{}
+	resp := &ct.SellerEmpty{}
 	query := `UPDATE seller SET
 							 deleted_at=NOW()
 							 WHERE id=$1 AND deleted_at is null RETURNING created_at`
@@ -117,15 +115,14 @@ func (c *sellerRepo) Delete(ctx context.Context, req *ct.SellerPrimaryKey) (*ct.
 		return nil, err
 	}
 
-	if err=helper.DeleteChecker(createdAt);err!=nil {
-		return resp,nil
+	if err = helper.DeleteChecker(createdAt); err != nil {
+		return resp, nil
 	}
 
 	return resp, nil
 }
 
-
-func (c *sellerRepo) GetList(ctx context.Context,req *ct.GetListSellerRequest) (*ct.GetListSellerResponse,error) {
+func (c *sellerRepo) GetList(ctx context.Context, req *ct.GetListSellerRequest) (*ct.GetListSellerResponse, error) {
 	resp := &ct.GetListSellerResponse{}
 
 	filter := ""
@@ -184,13 +181,13 @@ func (c *sellerRepo) GetList(ctx context.Context,req *ct.GetListSellerRequest) (
 	return resp, nil
 }
 
-func (c *sellerRepo) GetByGmail(ctx context.Context,req *ct.SellerGmail) (*ct.SellerPrimaryKey,error) {
-	query:=`SELECT id FROM seller WHERE gmail=$1`
+func (c *sellerRepo) GetByGmail(ctx context.Context, req *ct.SellerGmail) (*ct.SellerPrimaryKey, error) {
+	query := `SELECT id FROM seller WHERE gmail=$1`
 	var id string
-	err:=c.db.QueryRow(ctx,query,req.Gmail).Scan(&id)
+	err := c.db.QueryRow(ctx, query, req.Gmail).Scan(&id)
 	if err != nil {
 		return nil, err
 	}
 
-	return &ct.SellerPrimaryKey{Id: id},nil
+	return &ct.SellerPrimaryKey{Id: id}, nil
 }

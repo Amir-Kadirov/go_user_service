@@ -4,6 +4,8 @@
 // - protoc             v3.21.12
 // source: category.proto
 
+// import "protos/catalog_service/product.proto";
+
 package catalog_service
 
 import (
@@ -19,11 +21,12 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	CategoryService_Create_FullMethodName  = "/catalog_service.CategoryService/Create"
-	CategoryService_GetByID_FullMethodName = "/catalog_service.CategoryService/GetByID"
-	CategoryService_GetList_FullMethodName = "/catalog_service.CategoryService/GetList"
-	CategoryService_Update_FullMethodName  = "/catalog_service.CategoryService/Update"
-	CategoryService_Delete_FullMethodName  = "/catalog_service.CategoryService/Delete"
+	CategoryService_Create_FullMethodName                   = "/catalog_service.CategoryService/Create"
+	CategoryService_GetByID_FullMethodName                  = "/catalog_service.CategoryService/GetByID"
+	CategoryService_GetList_FullMethodName                  = "/catalog_service.CategoryService/GetList"
+	CategoryService_Update_FullMethodName                   = "/catalog_service.CategoryService/Update"
+	CategoryService_Delete_FullMethodName                   = "/catalog_service.CategoryService/Delete"
+	CategoryService_GetCategoryWithProductId_FullMethodName = "/catalog_service.CategoryService/GetCategoryWithProductId"
 )
 
 // CategoryServiceClient is the client API for CategoryService service.
@@ -31,10 +34,11 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CategoryServiceClient interface {
 	Create(ctx context.Context, in *CreateCategory, opts ...grpc.CallOption) (*Category, error)
-	GetByID(ctx context.Context, in *CategoryPrimaryKey, opts ...grpc.CallOption) (*Category, error)
+	GetByID(ctx context.Context, in *CategoryPrimaryKey, opts ...grpc.CallOption) (*GetCategory, error)
 	GetList(ctx context.Context, in *GetListCategoryRequest, opts ...grpc.CallOption) (*GetListCategoryResponse, error)
-	Update(ctx context.Context, in *UpdateCategory, opts ...grpc.CallOption) (*Category, error)
+	Update(ctx context.Context, in *UpdateCategory, opts ...grpc.CallOption) (*GetCategory, error)
 	Delete(ctx context.Context, in *CategoryPrimaryKey, opts ...grpc.CallOption) (*Empty, error)
+	GetCategoryWithProductId(ctx context.Context, in *CategoryPrimaryKey, opts ...grpc.CallOption) (*GetCategory, error)
 }
 
 type categoryServiceClient struct {
@@ -54,8 +58,8 @@ func (c *categoryServiceClient) Create(ctx context.Context, in *CreateCategory, 
 	return out, nil
 }
 
-func (c *categoryServiceClient) GetByID(ctx context.Context, in *CategoryPrimaryKey, opts ...grpc.CallOption) (*Category, error) {
-	out := new(Category)
+func (c *categoryServiceClient) GetByID(ctx context.Context, in *CategoryPrimaryKey, opts ...grpc.CallOption) (*GetCategory, error) {
+	out := new(GetCategory)
 	err := c.cc.Invoke(ctx, CategoryService_GetByID_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -72,8 +76,8 @@ func (c *categoryServiceClient) GetList(ctx context.Context, in *GetListCategory
 	return out, nil
 }
 
-func (c *categoryServiceClient) Update(ctx context.Context, in *UpdateCategory, opts ...grpc.CallOption) (*Category, error) {
-	out := new(Category)
+func (c *categoryServiceClient) Update(ctx context.Context, in *UpdateCategory, opts ...grpc.CallOption) (*GetCategory, error) {
+	out := new(GetCategory)
 	err := c.cc.Invoke(ctx, CategoryService_Update_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -90,36 +94,51 @@ func (c *categoryServiceClient) Delete(ctx context.Context, in *CategoryPrimaryK
 	return out, nil
 }
 
+func (c *categoryServiceClient) GetCategoryWithProductId(ctx context.Context, in *CategoryPrimaryKey, opts ...grpc.CallOption) (*GetCategory, error) {
+	out := new(GetCategory)
+	err := c.cc.Invoke(ctx, CategoryService_GetCategoryWithProductId_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CategoryServiceServer is the server API for CategoryService service.
-// All implementations should embed UnimplementedCategoryServiceServer
+// All implementations must embed UnimplementedCategoryServiceServer
 // for forward compatibility
 type CategoryServiceServer interface {
 	Create(context.Context, *CreateCategory) (*Category, error)
-	GetByID(context.Context, *CategoryPrimaryKey) (*Category, error)
+	GetByID(context.Context, *CategoryPrimaryKey) (*GetCategory, error)
 	GetList(context.Context, *GetListCategoryRequest) (*GetListCategoryResponse, error)
-	Update(context.Context, *UpdateCategory) (*Category, error)
+	Update(context.Context, *UpdateCategory) (*GetCategory, error)
 	Delete(context.Context, *CategoryPrimaryKey) (*Empty, error)
+	GetCategoryWithProductId(context.Context, *CategoryPrimaryKey) (*GetCategory, error)
+	mustEmbedUnimplementedCategoryServiceServer()
 }
 
-// UnimplementedCategoryServiceServer should be embedded to have forward compatible implementations.
+// UnimplementedCategoryServiceServer must be embedded to have forward compatible implementations.
 type UnimplementedCategoryServiceServer struct {
 }
 
 func (UnimplementedCategoryServiceServer) Create(context.Context, *CreateCategory) (*Category, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
 }
-func (UnimplementedCategoryServiceServer) GetByID(context.Context, *CategoryPrimaryKey) (*Category, error) {
+func (UnimplementedCategoryServiceServer) GetByID(context.Context, *CategoryPrimaryKey) (*GetCategory, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetByID not implemented")
 }
 func (UnimplementedCategoryServiceServer) GetList(context.Context, *GetListCategoryRequest) (*GetListCategoryResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetList not implemented")
 }
-func (UnimplementedCategoryServiceServer) Update(context.Context, *UpdateCategory) (*Category, error) {
+func (UnimplementedCategoryServiceServer) Update(context.Context, *UpdateCategory) (*GetCategory, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
 }
 func (UnimplementedCategoryServiceServer) Delete(context.Context, *CategoryPrimaryKey) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
+func (UnimplementedCategoryServiceServer) GetCategoryWithProductId(context.Context, *CategoryPrimaryKey) (*GetCategory, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCategoryWithProductId not implemented")
+}
+func (UnimplementedCategoryServiceServer) mustEmbedUnimplementedCategoryServiceServer() {}
 
 // UnsafeCategoryServiceServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to CategoryServiceServer will
@@ -222,6 +241,24 @@ func _CategoryService_Delete_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CategoryService_GetCategoryWithProductId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CategoryPrimaryKey)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CategoryServiceServer).GetCategoryWithProductId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CategoryService_GetCategoryWithProductId_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CategoryServiceServer).GetCategoryWithProductId(ctx, req.(*CategoryPrimaryKey))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CategoryService_ServiceDesc is the grpc.ServiceDesc for CategoryService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -248,6 +285,10 @@ var CategoryService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Delete",
 			Handler:    _CategoryService_Delete_Handler,
+		},
+		{
+			MethodName: "GetCategoryWithProductId",
+			Handler:    _CategoryService_GetCategoryWithProductId_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

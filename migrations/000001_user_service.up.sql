@@ -72,7 +72,7 @@
   );
 
 
-  CREATE TABLE IF NOT EXISTS system_user(
+  CREATE TABLE IF NOT EXISTS "system_user"(
       id uuid PRIMARY KEY,
       phone varchar(20),
       gmail varchar(30),

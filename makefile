@@ -5,6 +5,7 @@ APP_CMD_DIR=${CURRENT_DIR}/cmd
 
 gen-proto-module:
 	rm -rf ${CURRENT_DIR}/genproto
+	mkdir -p ${CURRENT_DIR}/genproto
 	./scripts/gen_proto.sh ${CURRENT_DIR}
 
 

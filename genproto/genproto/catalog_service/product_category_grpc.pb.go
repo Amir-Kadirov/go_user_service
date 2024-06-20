@@ -80,16 +80,17 @@ func (c *productCategoryServiceClient) DeleteProductCategory(ctx context.Context
 }
 
 // ProductCategoryServiceServer is the server API for ProductCategoryService service.
-// All implementations should embed UnimplementedProductCategoryServiceServer
+// All implementations must embed UnimplementedProductCategoryServiceServer
 // for forward compatibility
 type ProductCategoryServiceServer interface {
 	CreateProductCategory(context.Context, *CreateProductCategoryRequest) (*ProductCategory, error)
 	GetProductCategoriesByProductID(context.Context, *GetProductCategoriesByProductIDRequest) (*GetProductCategoriesByProductIDResponse, error)
 	GetProductCategoriesByCategoryID(context.Context, *GetProductCategoriesByCategoryIDRequest) (*GetProductCategoriesByCategoryIDResponse, error)
 	DeleteProductCategory(context.Context, *DeleteProductCategoryRequest) (*Empty2, error)
+	mustEmbedUnimplementedProductCategoryServiceServer()
 }
 
-// UnimplementedProductCategoryServiceServer should be embedded to have forward compatible implementations.
+// UnimplementedProductCategoryServiceServer must be embedded to have forward compatible implementations.
 type UnimplementedProductCategoryServiceServer struct {
 }
 
@@ -104,6 +105,8 @@ func (UnimplementedProductCategoryServiceServer) GetProductCategoriesByCategoryI
 }
 func (UnimplementedProductCategoryServiceServer) DeleteProductCategory(context.Context, *DeleteProductCategoryRequest) (*Empty2, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteProductCategory not implemented")
+}
+func (UnimplementedProductCategoryServiceServer) mustEmbedUnimplementedProductCategoryServiceServer() {
 }
 
 // UnsafeProductCategoryServiceServer may be embedded to opt out of forward compatibility for this service.

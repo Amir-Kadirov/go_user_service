@@ -91,7 +91,7 @@ func (c *productServiceClient) Delete(ctx context.Context, in *ProductPrimaryKey
 }
 
 // ProductServiceServer is the server API for ProductService service.
-// All implementations should embed UnimplementedProductServiceServer
+// All implementations must embed UnimplementedProductServiceServer
 // for forward compatibility
 type ProductServiceServer interface {
 	Create(context.Context, *CreateProduct) (*Product, error)
@@ -99,9 +99,10 @@ type ProductServiceServer interface {
 	GetList(context.Context, *GetListProductRequest) (*GetListProductResponse, error)
 	Update(context.Context, *UpdateProduct) (*Product, error)
 	Delete(context.Context, *ProductPrimaryKey) (*Empty1, error)
+	mustEmbedUnimplementedProductServiceServer()
 }
 
-// UnimplementedProductServiceServer should be embedded to have forward compatible implementations.
+// UnimplementedProductServiceServer must be embedded to have forward compatible implementations.
 type UnimplementedProductServiceServer struct {
 }
 
@@ -120,6 +121,7 @@ func (UnimplementedProductServiceServer) Update(context.Context, *UpdateProduct)
 func (UnimplementedProductServiceServer) Delete(context.Context, *ProductPrimaryKey) (*Empty1, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
+func (UnimplementedProductServiceServer) mustEmbedUnimplementedProductServiceServer() {}
 
 // UnsafeProductServiceServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to ProductServiceServer will

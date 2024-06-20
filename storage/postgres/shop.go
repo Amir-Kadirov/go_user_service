@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"log"
-	ct "user_service/genproto/user_service"
+	ct "user_service/genproto/genproto/user_service"
 	"user_service/pkg/helper"
 	"user_service/storage"
 
@@ -90,8 +90,10 @@ func (c *shopRepo) GetById(ctx context.Context, req *ct.ShopPrimaryKey) (*ct.Get
 			WHERE id=$1 AND deleted_at is null`
 
 	row := c.db.QueryRow(ctx, query, req.Id)
-	var (createdAt, updatedAt sql.NullTime
-		longitude, latitude      float64)
+	var (
+		createdAt, updatedAt sql.NullTime
+		longitude, latitude  float64
+	)
 	if err := row.Scan(
 		&resp.Slug,
 		&resp.Phone,
@@ -111,7 +113,7 @@ func (c *shopRepo) GetById(ctx context.Context, req *ct.ShopPrimaryKey) (*ct.Get
 		return nil, err
 	}
 
-	resp.Location=&ct.LocationShop{Longitude: longitude,Latitude: latitude}
+	resp.Location = &ct.LocationShop{Longitude: longitude, Latitude: latitude}
 	resp.CreatedAt = helper.NullTimeStampToString(createdAt)
 	resp.UpdatedAt = helper.NullTimeStampToString(updatedAt)
 
@@ -134,7 +136,7 @@ func (c *shopRepo) Update(ctx context.Context, req *ct.UpdateShopRequest) (*ct.S
 								 updated_at=NOW()
 								 WHERE id=$13 AND deleted_at is null`
 	_, err := c.db.Exec(ctx, query, req.Phone, req.NameUz, req.NameRu, req.NameEn, req.DescriptionUz,
-		req.DescriptionRu, req.DescriptionEn, req.Location, req.Currency, pq.Array(req.PaymentTypes),req.Location.Longitude,req.Location.Latitude, req.Id)
+		req.DescriptionRu, req.DescriptionEn, req.Location, req.Currency, pq.Array(req.PaymentTypes), req.Location.Longitude, req.Location.Latitude, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -200,8 +202,9 @@ func (c *shopRepo) GetList(ctx context.Context, req *ct.GetListShopRequest) (*ct
 	defer rows.Close()
 
 	for rows.Next() {
-		var (createdAt, updatedAt sql.NullTime
-			longitude, latitude      float64
+		var (
+			createdAt, updatedAt sql.NullTime
+			longitude, latitude  float64
 		)
 		if err := rows.Scan(
 			&shop.Slug,
@@ -222,7 +225,7 @@ func (c *shopRepo) GetList(ctx context.Context, req *ct.GetListShopRequest) (*ct
 			return nil, err
 		}
 
-		shop.Location=&ct.LocationShop{Longitude: longitude,Latitude: latitude}
+		shop.Location = &ct.LocationShop{Longitude: longitude, Latitude: latitude}
 		shop.CreatedAt = helper.NullTimeStampToString(createdAt)
 		shop.UpdatedAt = helper.NullTimeStampToString(updatedAt)
 		resp.Shop = append(resp.Shop, shop)

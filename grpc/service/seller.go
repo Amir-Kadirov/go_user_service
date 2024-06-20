@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"user_service/config"
-	"user_service/genproto/user_service"
+	"user_service/genproto/genproto/user_service"
 	"user_service/grpc/client"
 	"user_service/storage"
 
@@ -11,15 +11,21 @@ import (
 )
 
 type SellerService struct {
+	user_service.UnimplementedSellerServiceServer
 	cfg      config.Config
 	log      logger.LoggerI
 	strg     storage.StorageI
 	services client.ServiceManagerI
 }
 
+// mustEmbedUnimplementedSellerServiceServer implements user_service.SellerServiceServer.
+func (c *SellerService) mustEmbedUnimplementedSellerServiceServer() {
+	panic("unimplemented")
+}
+
 func NewSellerService(cfg config.Config, log logger.LoggerI, strg storage.StorageI, srvs client.ServiceManagerI) *SellerService {
 	return &SellerService{
-		cfg:      cfg,	
+		cfg:      cfg,
 		log:      log,
 		strg:     strg,
 		services: srvs,
@@ -36,7 +42,7 @@ func (c *SellerService) Create(ctx context.Context, req *user_service.CreateSell
 	}
 
 	return resp, nil
-}	
+}
 
 func (c *SellerService) GetByID(ctx context.Context, req *user_service.SellerPrimaryKey) (*user_service.Seller, error) {
 	c.log.Info("---GetByIdSeller--->>>", logger.Any("req", req))
@@ -62,7 +68,7 @@ func (c *SellerService) GetList(ctx context.Context, req *user_service.GetListSe
 	return resp, nil
 }
 
-func (c *SellerService) Update(ctx context.Context,req *user_service.UpdateSellerRequest) (*user_service.UpdateSellerResponse,error) {
+func (c *SellerService) Update(ctx context.Context, req *user_service.UpdateSellerRequest) (*user_service.UpdateSellerResponse, error) {
 	c.log.Info("---UpdateSeller--->>>", logger.Any("req", req))
 
 	resp, err := c.strg.Seller().Update(ctx, req)
@@ -74,7 +80,7 @@ func (c *SellerService) Update(ctx context.Context,req *user_service.UpdateSelle
 	return resp, nil
 }
 
-func (c *SellerService) Delete(ctx context.Context,req *user_service.SellerPrimaryKey) (*user_service.SellerEmpty,error) {
+func (c *SellerService) Delete(ctx context.Context, req *user_service.SellerPrimaryKey) (*user_service.SellerEmpty, error) {
 	c.log.Info("---DeleteSeller--->>>", logger.Any("req", req))
 
 	resp, err := c.strg.Seller().Delete(ctx, req)
@@ -86,7 +92,7 @@ func (c *SellerService) Delete(ctx context.Context,req *user_service.SellerPrima
 	return resp, nil
 }
 
-func (c *SellerService) GetByGmail(ctx context.Context,req *user_service.SellerGmail) (*user_service.SellerPrimaryKey,error) {
+func (c *SellerService) GetByGmail(ctx context.Context, req *user_service.SellerGmail) (*user_service.SellerPrimaryKey, error) {
 	c.log.Info("---GetByGmailSeller--->>>", logger.Any("req", req))
 
 	resp, err := c.strg.Seller().GetByGmail(ctx, req)

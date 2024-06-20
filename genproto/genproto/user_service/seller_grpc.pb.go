@@ -102,7 +102,7 @@ func (c *sellerServiceClient) GetByGmail(ctx context.Context, in *SellerGmail, o
 }
 
 // SellerServiceServer is the server API for SellerService service.
-// All implementations should embed UnimplementedSellerServiceServer
+// All implementations must embed UnimplementedSellerServiceServer
 // for forward compatibility
 type SellerServiceServer interface {
 	Create(context.Context, *CreateSeller) (*SellerPrimaryKey, error)
@@ -111,9 +111,10 @@ type SellerServiceServer interface {
 	Update(context.Context, *UpdateSellerRequest) (*UpdateSellerResponse, error)
 	Delete(context.Context, *SellerPrimaryKey) (*SellerEmpty, error)
 	GetByGmail(context.Context, *SellerGmail) (*SellerPrimaryKey, error)
+	mustEmbedUnimplementedSellerServiceServer()
 }
 
-// UnimplementedSellerServiceServer should be embedded to have forward compatible implementations.
+// UnimplementedSellerServiceServer must be embedded to have forward compatible implementations.
 type UnimplementedSellerServiceServer struct {
 }
 
@@ -135,6 +136,7 @@ func (UnimplementedSellerServiceServer) Delete(context.Context, *SellerPrimaryKe
 func (UnimplementedSellerServiceServer) GetByGmail(context.Context, *SellerGmail) (*SellerPrimaryKey, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetByGmail not implemented")
 }
+func (UnimplementedSellerServiceServer) mustEmbedUnimplementedSellerServiceServer() {}
 
 // UnsafeSellerServiceServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to SellerServiceServer will

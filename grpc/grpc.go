@@ -2,7 +2,7 @@ package grpc
 
 import (
 	"user_service/config"
-	"user_service/genproto/user_service"
+	"user_service/genproto/genproto/user_service"
 	"user_service/grpc/client"
 	"user_service/grpc/service"
 	"user_service/storage"
@@ -20,11 +20,11 @@ func SetUpServer(cfg config.Config, log logger.LoggerI, strg storage.StorageI, s
 
 	user_service.RegisterShopServiceServer(grpcServer, service.NewShopService(cfg, log, strg, srvc))
 
-	user_service.RegisterSellerServiceServer(grpcServer,service.NewSellerService(cfg,log,strg,srvc))
+	user_service.RegisterSellerServiceServer(grpcServer, service.NewSellerService(cfg, log, strg, srvc))
 
-	user_service.RegisterBranchServiceServer(grpcServer,service.NewBranchService(cfg,log,strg,srvc))
+	user_service.RegisterBranchServiceServer(grpcServer, service.NewBranchService(cfg, log, strg, srvc))
 
-	user_service.RegisterSystemUserServiceServer(grpcServer,service.NewSystemUserService(cfg,log,strg,srvc))
+	user_service.RegisterSystemUserServiceServer(grpcServer, service.NewSystemUserService(cfg, log, strg, srvc))
 
 	reflection.Register(grpcServer)
 	return

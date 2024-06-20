@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"log"
-	ct "user_service/genproto/user_service"
+	ct "user_service/genproto/genproto/user_service"
 	"user_service/pkg/helper"
 	"user_service/storage"
 

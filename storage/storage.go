@@ -2,7 +2,7 @@ package storage
 
 import (
 	"context"
-	ct "user_service/genproto/user_service"
+	ct "user_service/genproto/genproto/user_service"
 )
 
 type StorageI interface {

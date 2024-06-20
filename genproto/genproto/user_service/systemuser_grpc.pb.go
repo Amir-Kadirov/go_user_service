@@ -102,7 +102,7 @@ func (c *systemUserServiceClient) GetByGmail(ctx context.Context, in *SystemUser
 }
 
 // SystemUserServiceServer is the server API for SystemUserService service.
-// All implementations should embed UnimplementedSystemUserServiceServer
+// All implementations must embed UnimplementedSystemUserServiceServer
 // for forward compatibility
 type SystemUserServiceServer interface {
 	Create(context.Context, *CreateSystemUser) (*SystemUserPrimaryKey, error)
@@ -111,9 +111,10 @@ type SystemUserServiceServer interface {
 	Update(context.Context, *UpdateSystemUserRequest) (*UpdateSystemUserResponse, error)
 	Delete(context.Context, *SystemUserPrimaryKey) (*SystemUserEmpty, error)
 	GetByGmail(context.Context, *SystemUserGmail) (*SystemUserPrimaryKey, error)
+	mustEmbedUnimplementedSystemUserServiceServer()
 }
 
-// UnimplementedSystemUserServiceServer should be embedded to have forward compatible implementations.
+// UnimplementedSystemUserServiceServer must be embedded to have forward compatible implementations.
 type UnimplementedSystemUserServiceServer struct {
 }
 
@@ -135,6 +136,7 @@ func (UnimplementedSystemUserServiceServer) Delete(context.Context, *SystemUserP
 func (UnimplementedSystemUserServiceServer) GetByGmail(context.Context, *SystemUserGmail) (*SystemUserPrimaryKey, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetByGmail not implemented")
 }
+func (UnimplementedSystemUserServiceServer) mustEmbedUnimplementedSystemUserServiceServer() {}
 
 // UnsafeSystemUserServiceServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to SystemUserServiceServer will
