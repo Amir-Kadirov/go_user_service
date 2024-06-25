@@ -39,62 +39,50 @@ func (c *BranchService) Create(ctx context.Context, req *user_service.CreateBran
 	return resp, nil
 }
 
-// func (c *BranchService) GetByID(ctx context.Context, req *user_service.BranchPrimaryKey) (*user_service.Branch, error) {
-// 	c.log.Info("---GetByIdBranch--->>>", logger.Any("req", req))
+func (c *BranchService) GetByID(ctx context.Context, req *user_service.BranchPrimaryKey) (*user_service.Branch, error) {
+	c.log.Info("---GetByIdBranch--->>>", logger.Any("req", req))
 
-// 	resp, err := c.strg.Branch().GetByID(ctx, req)
-// 	if err != nil {
-// 		c.log.Error("---GetByIdBranch--->>>", logger.Error(err))
-// 		return nil, err
-// 	}
+	resp, err := c.strg.Branch().GetByID(ctx, req)
+	if err != nil {
+		c.log.Error("---GetByIdBranch--->>>", logger.Error(err))
+		return nil, err
+	}
 
-// 	return resp, nil
-// }
+	return resp, nil
+}
 
-// func (c *BranchService) GetList(ctx context.Context, req *user_service.GetListBranchRequest) (*user_service.GetListBranchResponse, error) {
-// 	c.log.Info("---GetAllBranch--->>>", logger.Any("req", req))
+func (c *BranchService) GetList(ctx context.Context, req *user_service.GetListBranchRequest) (*user_service.GetListBranchResponse, error) {
+	c.log.Info("---GetAllBranch--->>>", logger.Any("req", req))
 
-// 	resp, err := c.strg.Branch().GetList(ctx, req)
-// 	if err != nil {
-// 		c.log.Error("---GetAllBranch--->>>", logger.Error(err))
-// 		return nil, err
-// 	}
+	resp, err := c.strg.Branch().GetList(ctx, req)
+	if err != nil {
+		c.log.Error("---GetAllBranch--->>>", logger.Error(err))
+		return nil, err
+	}
 
-// 	return resp, nil
-// }
+	return resp, nil
+}
 
-// func (c *BranchService) Update(ctx context.Context, req *user_service.UpdateBranchRequest) (*user_service.UpdateBranchResponse, error) {
-// 	c.log.Info("---UpdateBranch--->>>", logger.Any("req", req))
+func (c *BranchService) Update(ctx context.Context, req *user_service.UpdateBranchRequest) (*user_service.BMessage, error) {
+	c.log.Info("---UpdateBranch--->>>", logger.Any("req", req))
 
-// 	resp, err := c.strg.Branch().Update(ctx, req)
-// 	if err != nil {
-// 		c.log.Error("---UpdateBranch--->>>", logger.Error(err))
-// 		return nil, err
-// 	}
+	resp, err := c.strg.Branch().Update(ctx, req)
+	if err != nil {
+		c.log.Error("---UpdateBranch--->>>", logger.Error(err))
+		return nil, err
+	}
 
-// 	return resp, nil
-// }
+	return resp, nil
+}
 
-// func (c *BranchService) Delete(ctx context.Context, req *user_service.BranchPrimaryKey) (*user_service.Empty, error) {
-// 	c.log.Info("---DeleteBranch--->>>", logger.Any("req", req))
+func (c *BranchService) Delete(ctx context.Context, req *user_service.BranchPrimaryKey) (*user_service.BMessage, error) {
+	c.log.Info("---DeleteBranch--->>>", logger.Any("req", req))
 
-// 	resp, err := c.strg.Branch().Delete(ctx, req)
-// 	if err != nil {
-// 		c.log.Error("---DeleteBranch--->>>", logger.Error(err))
-// 		return nil, err
-// 	}
+	resp, err := c.strg.Branch().Delete(ctx, req)
+	if err != nil {
+		c.log.Error("---DeleteBranch--->>>", logger.Error(err))
+		return nil, err
+	}
 
-// 	return resp, nil
-// }
-
-// func (c *BranchService) GetByGmail(ctx context.Context, req *user_service.BranchGmail) (*user_service.BranchPrimaryKey, error) {
-// 	c.log.Info("---GetByGmailBranch--->>>", logger.Any("req", req))
-
-// 	resp, err := c.strg.Branch().GetByGmail(ctx, req)
-// 	if err != nil {
-// 		c.log.Error("---GetByGmailBranch--->>>", logger.Error(err))
-// 		return nil, err
-// 	}
-
-// 	return resp, nil
-// }
+	return resp, nil
+}

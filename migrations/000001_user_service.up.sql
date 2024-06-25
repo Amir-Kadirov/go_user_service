@@ -61,29 +61,32 @@ CREATE TABLE IF NOT EXISTS "Branch" (
   "deleted_at" timestamp
 );
 
-ALTER TABLE "Teacher" ADD FOREIGN KEY ("SupportTeacherID") REFERENCES "SupportTeacher" ("ID");
+-- ALTER TABLE "Teacher" ADD FOREIGN KEY ("SupportTeacherID") REFERENCES "SupportTeacher" ("ID");
 
-ALTER TABLE "Teacher" ADD FOREIGN KEY ("BranchID") REFERENCES "Branch" ("ID");
+-- ALTER TABLE "Teacher" ADD FOREIGN KEY ("BranchID") REFERENCES "Branch" ("ID");
 
-ALTER TABLE "SupportTeacher" ADD FOREIGN KEY ("BranchID") REFERENCES "Branch" ("ID");
+-- ALTER TABLE "SupportTeacher" ADD FOREIGN KEY ("BranchID") REFERENCES "Branch" ("ID");
 
-ALTER TABLE "Administration" ADD FOREIGN KEY ("BranchID") REFERENCES "Branch" ("ID");
+-- ALTER TABLE "Administration" ADD FOREIGN KEY ("BranchID") REFERENCES "Branch" ("ID");
 
-ALTER TABLE "Manager" ADD FOREIGN KEY ("BranchID") REFERENCES "Branch" ("ID");
+-- ALTER TABLE "Manager" ADD FOREIGN KEY ("BranchID") REFERENCES "Branch" ("ID");
 
-ALTER TABLE "Teacher" ADD COLUMN "Email" varchar(255);
+-- ALTER TABLE "Teacher" ADD COLUMN "Email" varchar(255);
 
-ALTER TABLE "SupportTeacher" ADD COLUMN "Email" varchar(255);
+-- ALTER TABLE "SupportTeacher" ADD COLUMN "Email" varchar(255);
 
-ALTER TABLE "Administration" ADD COLUMN "Email" varchar(255);
+-- ALTER TABLE "Administration" ADD COLUMN "Email" varchar(255);
 
-ALTER TABLE "Manager" ADD COLUMN "Email" varchar(255);
+-- ALTER TABLE "Manager" ADD COLUMN "Email" varchar(255);
 
-CREATE EXTENSION IF NOT EXISTS postgis;
+-- CREATE EXTENSION IF NOT EXISTS postgis;
   
-ALTER TABLE "Branch" 
-ALTER COLUMN "Location" 
-TYPE GEOMETRY(POINT, 4326) 
-USING ST_SetSRID(ST_Centroid("Location"::geometry), 4326);
-UPDATE "Branch"
-SET "Location" = ST_GeomFromText("Location"::text, 4326);
+-- ALTER TABLE "Branch" 
+-- ALTER COLUMN "Location" 
+-- TYPE GEOMETRY(POINT, 4326) 
+-- USING ST_SetSRID(ST_Centroid("Location"::geometry), 4326);
+-- UPDATE "Branch"
+-- SET "Location" = ST_GeomFromText("Location"::text, 4326);
+
+ALTER TABLE "Branch"
+ADD CONSTRAINT unique_branch_code UNIQUE ("Addres");

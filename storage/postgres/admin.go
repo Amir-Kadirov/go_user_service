@@ -13,21 +13,21 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
-type SupportTeacherRepo struct {
+type AdminRepo struct {
 	db *pgxpool.Pool
 }
 
-func NewSupportTeacherRepo(db *pgxpool.Pool) storage.SupportTeacherRepoI {
-	return &SupportTeacherRepo{
+func NewAdminRepo(db *pgxpool.Pool) storage.AdminRepoI {
+	return &AdminRepo{
 		db: db,
 	}
 }
 
-func (c *SupportTeacherRepo) Create(ctx context.Context, req *ct.CreateSupportTeacher) (*ct.SupportTeacherPrimaryKey, error) {
+func (c *AdminRepo) Create(ctx context.Context, req *ct.CreateAdmin) (*ct.AdminPrimaryKey, error) {
 	id := uuid.NewString()
-	resp := &ct.SupportTeacherPrimaryKey{Id: id}
+	resp := &ct.AdminPrimaryKey{Id: id}
 
-	query := `INSERT INTO "SupportTeacher" (
+	query := `INSERT INTO "Administration" (
 			"ID",
 			"FullName",
 			"Phone",
@@ -35,7 +35,6 @@ func (c *SupportTeacherRepo) Create(ctx context.Context, req *ct.CreateSupportTe
 			"Email",
 			"Salary",
 			"IeltsScore",
-			"IeltsAttemptsCount",
 			"BranchID",
 			"created_at") VALUES (
 				$1,
@@ -46,7 +45,6 @@ func (c *SupportTeacherRepo) Create(ctx context.Context, req *ct.CreateSupportTe
 				$6,
 				$7,
 				$8,
-				$9,
 				NOW()
 			)`
 		hashedPassword,err:=hash.HashPassword(req.Password)
@@ -55,28 +53,27 @@ func (c *SupportTeacherRepo) Create(ctx context.Context, req *ct.CreateSupportTe
 		}
 
 	_, err = c.db.Exec(ctx, query, id,req.Fullname, req.Phone, hashedPassword, req.Email, 
-		req.Salary, req.Ieltsscore,req.Ieltsattemptscount,req.Branchid)
+		req.Salary, req.Ieltsscore,req.Branchid)
 	if err != nil {
-		log.Println("error while creating supportteacher")
+		log.Println("error while creating admin")
 		return nil, err
 	}
 
 	return resp, err
 }
 
-func (c *SupportTeacherRepo) GetByID(ctx context.Context, req *ct.SupportTeacherPrimaryKey) (*ct.SupportTeacher, error) {
-	resp := &ct.SupportTeacher{}
+func (c *AdminRepo) GetByID(ctx context.Context, req *ct.AdminPrimaryKey) (*ct.Admin, error) {
+	resp := &ct.Admin{}
 	query := `SELECT "ID",
-					"FullName",
-					"Phone",
-					"Email",
-					"Salary",
-					"IeltsScore",
-					"IeltsAttemptsCount",
-					"BranchID",
-					"created_at",
+					 "FullName",
+					 "Phone",
+					 "Email",
+					 "Salary",
+					 "IeltsScore",
+					 "BranchID",
+					 "created_at",
 					"updated_at"
-			FROM "SupportTeacher"
+			FROM "Administration"
 			WHERE "ID"=$1 AND "deleted_at" is null`
 
 	row := c.db.QueryRow(ctx, query, req.Id)
@@ -89,7 +86,6 @@ func (c *SupportTeacherRepo) GetByID(ctx context.Context, req *ct.SupportTeacher
 		&resp.Email,
 		&resp.Salary,
 		&resp.Ieltsscore,
-		&resp.Ieltsattemptscount,
 		&resp.Branchid,
 		&createdAt,
 		&updatedAt); err != nil {
@@ -102,8 +98,8 @@ func (c *SupportTeacherRepo) GetByID(ctx context.Context, req *ct.SupportTeacher
 	return resp, nil
 }
 
-func (c *SupportTeacherRepo) GetList(ctx context.Context, req *ct.GetListSupportTeacherRequest) (*ct.GetListSupportTeacherResponse, error) {
-	resp := &ct.GetListSupportTeacherResponse{}
+func (c *AdminRepo) GetList(ctx context.Context, req *ct.GetListAdminRequest) (*ct.GetListAdminResponse, error) {
+	resp := &ct.GetListAdminResponse{}
 	if req.Offset==0 {
 		req.Offset=1
 	}
@@ -116,17 +112,16 @@ func (c *SupportTeacherRepo) GetList(ctx context.Context, req *ct.GetListSupport
 	}
 
 	query := `SELECT 
-					"ID",
-					"FullName",
-					"Phone",
-					"Email",
-					"Salary",
-					"IeltsScore",
-					"IeltsAttemptsCount",
-					"BranchID",
-					"created_at",
-					"updated_at"
-			FROM "SupportTeacher"
+					 "ID",
+					 "FullName",
+					 "Phone",
+					 "Email",
+					 "Salary",
+					 "IeltsScore",
+					 "BranchID",
+					 "created_at",
+					 "updated_at"
+			FROM "Administration"
         	WHERE "deleted_at" is null AND TRUE ` + filter + `
            OFFSET $1 LIMIT $2
     `
@@ -138,28 +133,27 @@ func (c *SupportTeacherRepo) GetList(ctx context.Context, req *ct.GetListSupport
 	defer rows.Close()
 
 	for rows.Next() {
-		SupportTeacher := &ct.SupportTeacher{}
+		Admin := &ct.Admin{}
 		var createdAt, updatedAt sql.NullTime
 		if err := rows.Scan(
-			&SupportTeacher.Id,
-			&SupportTeacher.Fullname,
-			&SupportTeacher.Phone,
-			&SupportTeacher.Email,
-			&SupportTeacher.Salary,
-			&SupportTeacher.Ieltsscore,
-			&SupportTeacher.Ieltsattemptscount,
-			&SupportTeacher.Branchid,
+			&Admin.Id,
+			&Admin.Fullname,
+			&Admin.Phone,
+			&Admin.Email,
+			&Admin.Salary,
+			&Admin.Ieltsscore,
+			&Admin.Branchid,
 			&createdAt,
 			&updatedAt); err != nil {
 			return nil, err
 		}
 
-		SupportTeacher.CreatedAt = helper.NullTimeStampToString(createdAt)
-		SupportTeacher.UpdatedAt = helper.NullTimeStampToString(updatedAt)
-		resp.Supportteacher = append(resp.Supportteacher, SupportTeacher)
+		Admin.CreatedAt = helper.NullTimeStampToString(createdAt)
+		Admin.UpdatedAt = helper.NullTimeStampToString(updatedAt)
+		resp.Admin = append(resp.Admin, Admin)
 	}
 
-	queryCount := `SELECT COUNT(*) FROM "SupportTeacher" WHERE "deleted_at" is null AND TRUE ` + filter
+	queryCount := `SELECT COUNT(*) FROM "Administration" WHERE "deleted_at" is null AND TRUE ` + filter
 	err = c.db.QueryRow(ctx, queryCount).Scan(&resp.Count)
 	if err != nil {
 		return nil, err
@@ -168,20 +162,19 @@ func (c *SupportTeacherRepo) GetList(ctx context.Context, req *ct.GetListSupport
 	return resp, nil
 }
 
-func (c *SupportTeacherRepo) Update(ctx context.Context, req *ct.UpdateSupportTeacherRequest) (*ct.STMessage, error) {
-	resp := &ct.STMessage{Message: "SupportTeacher updated successfully"}
-	query := `UPDATE "SupportTeacher" SET
+func (c *AdminRepo) Update(ctx context.Context, req *ct.UpdateAdminRequest) (*ct.ADMessage, error) {
+	resp := &ct.ADMessage{Message: "Admin updated successfully"}
+	query := `UPDATE "Administration" SET
 								 "FullName"=$1,
 								 "Phone"=$2,
 								 "Email"=$3,
 								 "Salary"=$4,
 								 "IeltsScore"=$5,
-								 "IeltsAttemptsCount"=$6,
-								 "BranchID"=$7,
+								 "BranchID"=$6,
 								 "updated_at"=NOW()
-								 WHERE "ID"=$8 AND "deleted_at" is null`
+								 WHERE "ID"=$7 AND "deleted_at" is null`
 	_, err := c.db.Exec(ctx, query, req.Fullname, req.Phone, req.Email, req.Salary, req.Ieltsscore,
-									req.Ieltsattemptscount,req.Branchid,req.Id)
+									req.Branchid,req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -189,9 +182,9 @@ func (c *SupportTeacherRepo) Update(ctx context.Context, req *ct.UpdateSupportTe
 	return resp, nil
 }
 
-func (c *SupportTeacherRepo) Delete(ctx context.Context, req *ct.SupportTeacherPrimaryKey) (*ct.STMessage, error) {
-	resp := &ct.STMessage{Message: "Support teacher deleted successfully"}
-	query := `UPDATE "SupportTeacher" SET
+func (c *AdminRepo) Delete(ctx context.Context, req *ct.AdminPrimaryKey) (*ct.ADMessage, error) {
+	resp := &ct.ADMessage{Message: "Admin deleted successfully"}
+	query := `UPDATE "Administration" SET
 							 "deleted_at"=NOW()
 							 WHERE "ID"=$1 AND "deleted_at" is null RETURNING "created_at"`
 
@@ -208,13 +201,13 @@ func (c *SupportTeacherRepo) Delete(ctx context.Context, req *ct.SupportTeacherP
 	return resp, nil
 }
 
-func (c *SupportTeacherRepo) GetByGmail(ctx context.Context, req *ct.SupportTeacherGmail) (*ct.SupportTeacherPrimaryKey, error) {
-	query := `SELECT "ID" FROM "SupportTeacher" WHERE "Email"=$1`
+func (c *AdminRepo) GetByGmail(ctx context.Context, req *ct.AdminGmail) (*ct.AdminPrimaryKey, error) {
+	query := `SELECT "ID" FROM "Administration" WHERE "Email"=$1`
 	var id string
 	err := c.db.QueryRow(ctx, query, req.Gmail).Scan(&id)
 	if err != nil {
 		return nil, err
 	}
 
-	return &ct.SupportTeacherPrimaryKey{Id: id}, nil
+	return &ct.AdminPrimaryKey{Id: id}, nil
 }
