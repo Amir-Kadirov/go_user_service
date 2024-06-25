@@ -16,15 +16,12 @@ func SetUpServer(cfg config.Config, log logger.LoggerI, strg storage.StorageI, s
 
 	grpcServer = grpc.NewServer()
 
-	user_service.RegisterCustomerServiceServer(grpcServer, service.NewCustomerService(cfg, log, strg, srvc))
-
-	user_service.RegisterShopServiceServer(grpcServer, service.NewShopService(cfg, log, strg, srvc))
-
-	user_service.RegisterSellerServiceServer(grpcServer, service.NewSellerService(cfg, log, strg, srvc))
+	user_service.RegisterTeacherServiceServer(grpcServer, service.NewTeacherService(cfg, log, strg, srvc))
 
 	user_service.RegisterBranchServiceServer(grpcServer, service.NewBranchService(cfg, log, strg, srvc))
 
-	user_service.RegisterSystemUserServiceServer(grpcServer, service.NewSystemUserService(cfg, log, strg, srvc))
+	user_service.RegisterSupportTeacherServiceServer(grpcServer, service.NewSupportTeacherService(cfg, log, strg, srvc))
+
 
 	reflection.Register(grpcServer)
 	return

@@ -13,11 +13,9 @@ import (
 
 type Store struct {
 	db       *pgxpool.Pool
-	customer storage.CustomerRepoI
-	shop storage.ShopRepoI
-	seller storage.SellerRepoI
+	teacher storage.TeacherRepoI
+	supportteacher storage.SupportTeacherRepoI
 	branch storage.BranchRepoI
-	systemuser storage.SystemUserRepoI
 }
 
 
@@ -59,44 +57,26 @@ func (l *Store) Log(ctx context.Context, level pgx.LogLevel, msg string, data ma
 	log.Println(args...)
 }
 
-func (s *Store) Customer() storage.CustomerRepoI {
-	if s.customer == nil {
-		s.customer = NewCustomerRepo(s.db)
+func (s *Store) Teacher() storage.TeacherRepoI {
+	if s.teacher == nil {
+		s.teacher = NewTeacherRepo(s.db)
 	}
 
-	return s.customer
+	return s.teacher
 }
 
-
-func (s *Store) Shop() storage.ShopRepoI {
-	if s.shop == nil {
-		s.shop = NewShopRepo(s.db)
+func (s *Store) SupportTeacher() storage.SupportTeacherRepoI {
+	if s.supportteacher==nil {
+		s.supportteacher=NewSupportTeacherRepo(s.db)
 	}
 
-	return s.shop
-}
-
-
-func (s *Store) Seller() storage.SellerRepoI {
-	if s.seller == nil {
-		s.seller = NewSellerRepo(s.db)
-	}
-
-	return s.seller
+	return s.supportteacher
 }
 
 func (s *Store) Branch() storage.BranchRepoI {
-	if s.branch == nil {
-		s.branch = NewBranchRepo(s.db)
+	if s.branch==nil {
+		s.branch=NewBranchRepo(s.db)
 	}
 
 	return s.branch
-}
-
-func (s *Store) SystemUser() storage.SystemUserRepoI {
-	if s.systemuser == nil {
-		s.systemuser = NewSystemUserRepo(s.db)
-	}
-
-	return s.systemuser
 }

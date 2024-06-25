@@ -33,8 +33,8 @@ type BranchServiceClient interface {
 	Create(ctx context.Context, in *CreateBranch, opts ...grpc.CallOption) (*BranchPrimaryKey, error)
 	GetByID(ctx context.Context, in *BranchPrimaryKey, opts ...grpc.CallOption) (*Branch, error)
 	GetList(ctx context.Context, in *GetListBranchRequest, opts ...grpc.CallOption) (*GetListBranchResponse, error)
-	Update(ctx context.Context, in *UpdateBranchRequest, opts ...grpc.CallOption) (*UpdateBranchResponse, error)
-	Delete(ctx context.Context, in *BranchPrimaryKey, opts ...grpc.CallOption) (*BranchEmpty, error)
+	Update(ctx context.Context, in *UpdateBranchRequest, opts ...grpc.CallOption) (*BMessage, error)
+	Delete(ctx context.Context, in *BranchPrimaryKey, opts ...grpc.CallOption) (*BMessage, error)
 }
 
 type branchServiceClient struct {
@@ -72,8 +72,8 @@ func (c *branchServiceClient) GetList(ctx context.Context, in *GetListBranchRequ
 	return out, nil
 }
 
-func (c *branchServiceClient) Update(ctx context.Context, in *UpdateBranchRequest, opts ...grpc.CallOption) (*UpdateBranchResponse, error) {
-	out := new(UpdateBranchResponse)
+func (c *branchServiceClient) Update(ctx context.Context, in *UpdateBranchRequest, opts ...grpc.CallOption) (*BMessage, error) {
+	out := new(BMessage)
 	err := c.cc.Invoke(ctx, BranchService_Update_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -81,8 +81,8 @@ func (c *branchServiceClient) Update(ctx context.Context, in *UpdateBranchReques
 	return out, nil
 }
 
-func (c *branchServiceClient) Delete(ctx context.Context, in *BranchPrimaryKey, opts ...grpc.CallOption) (*BranchEmpty, error) {
-	out := new(BranchEmpty)
+func (c *branchServiceClient) Delete(ctx context.Context, in *BranchPrimaryKey, opts ...grpc.CallOption) (*BMessage, error) {
+	out := new(BMessage)
 	err := c.cc.Invoke(ctx, BranchService_Delete_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -97,8 +97,8 @@ type BranchServiceServer interface {
 	Create(context.Context, *CreateBranch) (*BranchPrimaryKey, error)
 	GetByID(context.Context, *BranchPrimaryKey) (*Branch, error)
 	GetList(context.Context, *GetListBranchRequest) (*GetListBranchResponse, error)
-	Update(context.Context, *UpdateBranchRequest) (*UpdateBranchResponse, error)
-	Delete(context.Context, *BranchPrimaryKey) (*BranchEmpty, error)
+	Update(context.Context, *UpdateBranchRequest) (*BMessage, error)
+	Delete(context.Context, *BranchPrimaryKey) (*BMessage, error)
 	mustEmbedUnimplementedBranchServiceServer()
 }
 
@@ -115,10 +115,10 @@ func (UnimplementedBranchServiceServer) GetByID(context.Context, *BranchPrimaryK
 func (UnimplementedBranchServiceServer) GetList(context.Context, *GetListBranchRequest) (*GetListBranchResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetList not implemented")
 }
-func (UnimplementedBranchServiceServer) Update(context.Context, *UpdateBranchRequest) (*UpdateBranchResponse, error) {
+func (UnimplementedBranchServiceServer) Update(context.Context, *UpdateBranchRequest) (*BMessage, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
 }
-func (UnimplementedBranchServiceServer) Delete(context.Context, *BranchPrimaryKey) (*BranchEmpty, error) {
+func (UnimplementedBranchServiceServer) Delete(context.Context, *BranchPrimaryKey) (*BMessage, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
 func (UnimplementedBranchServiceServer) mustEmbedUnimplementedBranchServiceServer() {}

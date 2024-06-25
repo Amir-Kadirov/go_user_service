@@ -10,4 +10,4 @@ gen-proto-module:
 
 
 migrate:
-	migrate -path ./migrations -database 'postgres://postgres:Amir2414@localhost:5432/user_service?sslmode=disable' up
+	migrate -path ./migrations -database 'postgres://postgres:Amir2414@localhost:5432/inter_user_service?sslmode=disable' up
