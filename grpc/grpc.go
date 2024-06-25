@@ -24,6 +24,8 @@ func SetUpServer(cfg config.Config, log logger.LoggerI, strg storage.StorageI, s
 
 	user_service.RegisterAdminServiceServer(grpcServer,service.NewAdminService(cfg,log,strg,srvc))
 
+	user_service.RegisterManagerServiceServer(grpcServer,service.NewManagerService(cfg,log,strg,srvc))
+
 
 	reflection.Register(grpcServer)
 	return

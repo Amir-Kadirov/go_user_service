@@ -17,6 +17,7 @@ type Store struct {
 	supportteacher storage.SupportTeacherRepoI
 	branch storage.BranchRepoI
 	admin storage.AdminRepoI
+	manager storage.ManagerRepoI
 }
 
 
@@ -88,4 +89,12 @@ func (s *Store) Admin() storage.AdminRepoI {
 	}
 
 	return s.admin
+}
+
+func (s *Store) Manager() storage.ManagerRepoI {
+	if s.manager==nil {
+		s.manager=NewManagerRepo(s.db)
+	}
+
+	return s.manager
 }

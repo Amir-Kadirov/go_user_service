@@ -11,6 +11,7 @@ type StorageI interface {
 	SupportTeacher() SupportTeacherRepoI
 	Branch() BranchRepoI
 	Admin() AdminRepoI
+	Manager() ManagerRepoI
 }
 
 type TeacherRepoI interface {
@@ -38,7 +39,7 @@ type BranchRepoI interface {
 	Update(ctx context.Context, req *ct.UpdateBranchRequest) (resp *ct.BMessage, err error)
 	Delete(ctx context.Context, req *ct.BranchPrimaryKey) (resp *ct.BMessage, err error)
 }
-	
+
 type AdminRepoI interface {
 	Create(ctx context.Context, req *ct.CreateAdmin) (resp *ct.AdminPrimaryKey, err error)
 	GetByID(ctx context.Context, req *ct.AdminPrimaryKey) (resp *ct.Admin, err error)
@@ -46,4 +47,13 @@ type AdminRepoI interface {
 	Update(ctx context.Context, req *ct.UpdateAdminRequest) (resp *ct.ADMessage, err error)
 	Delete(ctx context.Context, req *ct.AdminPrimaryKey) (resp *ct.ADMessage, err error)
 	GetByGmail(ctx context.Context, req *ct.AdminGmail) (*ct.AdminPrimaryKey, error)
+}
+
+type ManagerRepoI interface {
+	Create(ctx context.Context, req *ct.CreateManager) (resp *ct.ManagerPrimaryKey, err error)
+	GetByID(ctx context.Context, req *ct.ManagerPrimaryKey) (resp *ct.Manager, err error)
+	GetList(ctx context.Context, req *ct.GetListManagerRequest) (resp *ct.GetListManagerResponse, err error)
+	Update(ctx context.Context, req *ct.UpdateManagerRequest) (resp *ct.MGMessage, err error)
+	Delete(ctx context.Context, req *ct.ManagerPrimaryKey) (resp *ct.MGMessage, err error)
+	GetByGmail(ctx context.Context, req *ct.ManagerGmail) (*ct.ManagerPrimaryKey, error)
 }
