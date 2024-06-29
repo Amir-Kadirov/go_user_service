@@ -98,3 +98,16 @@ func (c *TeacherService) GetByGmail(ctx context.Context, req *user_service.Teach
 
 	return resp, nil
 }
+
+
+func (c *TeacherService) TeacherReport(ctx context.Context, req *user_service.GetListTeacherRequest) (*user_service.GetRepTeacherResponse, error) {
+	c.log.Info("---TeacherReportTeacher--->>>", logger.Any("req", req))
+
+	resp, err := c.strg.Teacher().TeacherReport(ctx, req)
+	if err != nil {
+		c.log.Error("---TeacherReportTeacher--->>>", logger.Error(err))
+		return nil, err
+	}
+
+	return resp, nil
+}

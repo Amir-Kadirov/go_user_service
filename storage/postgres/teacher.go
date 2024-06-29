@@ -224,3 +224,64 @@ func (c *TeacherRepo) GetByGmail(ctx context.Context, req *ct.TeacherGmail) (*ct
 
 	return &ct.TeacherPrimaryKey{Id: id}, nil
 }
+
+func (c *TeacherRepo) TeacherReport(ctx context.Context, req *ct.GetListTeacherRequest) (*ct.GetRepTeacherResponse, error) {
+	resp := &ct.GetRepTeacherResponse{}
+
+	filter := ""
+	offset := (req.Offset - 1) * req.Limit
+
+	if req.Search != "" {
+		filter = ` AND "BranchID" ILIKE '%` + req.Search + `%' `
+	}
+
+	query := `SELECT
+					"ID",
+					"FullName",
+					"Phone",
+=					"Salary",
+					"IeltsScore",
+					"BranchID",
+					"created_at",
+					"updated_at"
+			FROM "Teacher"
+        	WHERE "deleted_at" is null AND TRUE ` + filter + `
+           OFFSET $1 LIMIT $2
+    `
+
+	rows, err := c.db.Query(ctx, query, offset, req.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		Teacher := &ct.TeacherRep{}
+		var createdAt, updatedAt sql.NullTime
+		if err := rows.Scan(
+			&Teacher.Id,
+			&Teacher.Fullname,
+			&Teacher.Phone,
+			&Teacher.Salary,
+			&Teacher.Ieltsscore,
+			&Teacher.BranchId,
+			&createdAt,
+			&updatedAt); err != nil {
+			return nil, err
+		}
+
+		Teacher.MonhtWorked=int32(helper.DateSince(createdAt))
+		Teacher.TotalSum=Teacher.MonhtWorked*Teacher.Salary
+		Teacher.CreatedAt = helper.NullTimeStampToString(createdAt)
+		Teacher.UpdatedAt = helper.NullTimeStampToString(updatedAt)
+		resp.Teacher = append(resp.Teacher, Teacher)
+	}
+
+	queryCount := `SELECT COUNT(*) FROM "Teacher" WHERE "deleted_at" is null AND TRUE ` + filter
+	err = c.db.QueryRow(ctx, queryCount).Scan(&resp.Count)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}

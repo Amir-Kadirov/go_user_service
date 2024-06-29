@@ -98,8 +98,8 @@ func (c *BranchRepo) GetList(ctx context.Context, req *ct.GetListBranchRequest) 
 	query := `SELECT 
 					 "ID",
 					 "Addres",
-					 ST_Y(location) AS latitude, 
-      				 ST_X(location) AS longitude,
+					 ST_Y("Location") AS latitude, 
+      				 ST_X("Location") AS longitude,
 					 "created_at",
 					 "updated_at"
 			FROM "Branch"
@@ -115,17 +115,19 @@ func (c *BranchRepo) GetList(ctx context.Context, req *ct.GetListBranchRequest) 
 
 	for rows.Next() {
 		Branch := &ct.Branch{}
-		var createdAt, updatedAt sql.NullTime
+		location:=&ct.Location{} 
+		var (createdAt, updatedAt sql.NullTime)
 		if err := rows.Scan(
 			&Branch.Id,
 			&Branch.Address,
-			&Branch.Location.Latitude,
-			&Branch.Location.Longitude,
+			&location.Latitude,
+			&location.Longitude,
 			&createdAt,
 			&updatedAt); err != nil {
 			return nil, err
 		}
 
+		Branch.Location=location
 		Branch.CreatedAt = helper.NullTimeStampToString(createdAt)
 		Branch.UpdatedAt = helper.NullTimeStampToString(updatedAt)
 		resp.Branches = append(resp.Branches, Branch)
@@ -173,4 +175,8 @@ func (c *BranchRepo) Delete(ctx context.Context, req *ct.BranchPrimaryKey) (*ct.
 	}
 
 	return resp, nil
+}
+
+func BranchReport()  {
+	
 }

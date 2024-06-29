@@ -21,6 +21,7 @@ type TeacherRepoI interface {
 	Update(ctx context.Context, req *ct.UpdateTeacherRequest) (resp *ct.Message, err error)
 	Delete(ctx context.Context, req *ct.TeacherPrimaryKey) (resp *ct.Message, err error)
 	GetByGmail(ctx context.Context, req *ct.TeacherGmail) (*ct.TeacherPrimaryKey, error)
+	TeacherReport(ctx context.Context, req *ct.GetListTeacherRequest) (*ct.GetRepTeacherResponse, error)
 }
 
 type SupportTeacherRepoI interface {

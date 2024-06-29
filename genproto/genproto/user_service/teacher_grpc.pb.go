@@ -19,12 +19,13 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	TeacherService_Create_FullMethodName     = "/user_service.TeacherService/Create"
-	TeacherService_GetByID_FullMethodName    = "/user_service.TeacherService/GetByID"
-	TeacherService_GetList_FullMethodName    = "/user_service.TeacherService/GetList"
-	TeacherService_Update_FullMethodName     = "/user_service.TeacherService/Update"
-	TeacherService_Delete_FullMethodName     = "/user_service.TeacherService/Delete"
-	TeacherService_GetByGmail_FullMethodName = "/user_service.TeacherService/GetByGmail"
+	TeacherService_Create_FullMethodName        = "/user_service.TeacherService/Create"
+	TeacherService_GetByID_FullMethodName       = "/user_service.TeacherService/GetByID"
+	TeacherService_GetList_FullMethodName       = "/user_service.TeacherService/GetList"
+	TeacherService_Update_FullMethodName        = "/user_service.TeacherService/Update"
+	TeacherService_Delete_FullMethodName        = "/user_service.TeacherService/Delete"
+	TeacherService_GetByGmail_FullMethodName    = "/user_service.TeacherService/GetByGmail"
+	TeacherService_TeacherReport_FullMethodName = "/user_service.TeacherService/TeacherReport"
 )
 
 // TeacherServiceClient is the client API for TeacherService service.
@@ -37,6 +38,7 @@ type TeacherServiceClient interface {
 	Update(ctx context.Context, in *UpdateTeacherRequest, opts ...grpc.CallOption) (*Message, error)
 	Delete(ctx context.Context, in *TeacherPrimaryKey, opts ...grpc.CallOption) (*Message, error)
 	GetByGmail(ctx context.Context, in *TeacherGmail, opts ...grpc.CallOption) (*TeacherPrimaryKey, error)
+	TeacherReport(ctx context.Context, in *GetListTeacherRequest, opts ...grpc.CallOption) (*GetRepTeacherResponse, error)
 }
 
 type teacherServiceClient struct {
@@ -101,6 +103,15 @@ func (c *teacherServiceClient) GetByGmail(ctx context.Context, in *TeacherGmail,
 	return out, nil
 }
 
+func (c *teacherServiceClient) TeacherReport(ctx context.Context, in *GetListTeacherRequest, opts ...grpc.CallOption) (*GetRepTeacherResponse, error) {
+	out := new(GetRepTeacherResponse)
+	err := c.cc.Invoke(ctx, TeacherService_TeacherReport_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TeacherServiceServer is the server API for TeacherService service.
 // All implementations must embed UnimplementedTeacherServiceServer
 // for forward compatibility
@@ -111,6 +122,7 @@ type TeacherServiceServer interface {
 	Update(context.Context, *UpdateTeacherRequest) (*Message, error)
 	Delete(context.Context, *TeacherPrimaryKey) (*Message, error)
 	GetByGmail(context.Context, *TeacherGmail) (*TeacherPrimaryKey, error)
+	TeacherReport(context.Context, *GetListTeacherRequest) (*GetRepTeacherResponse, error)
 	mustEmbedUnimplementedTeacherServiceServer()
 }
 
@@ -135,6 +147,9 @@ func (UnimplementedTeacherServiceServer) Delete(context.Context, *TeacherPrimary
 }
 func (UnimplementedTeacherServiceServer) GetByGmail(context.Context, *TeacherGmail) (*TeacherPrimaryKey, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetByGmail not implemented")
+}
+func (UnimplementedTeacherServiceServer) TeacherReport(context.Context, *GetListTeacherRequest) (*GetRepTeacherResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TeacherReport not implemented")
 }
 func (UnimplementedTeacherServiceServer) mustEmbedUnimplementedTeacherServiceServer() {}
 
@@ -257,6 +272,24 @@ func _TeacherService_GetByGmail_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TeacherService_TeacherReport_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetListTeacherRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TeacherServiceServer).TeacherReport(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TeacherService_TeacherReport_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TeacherServiceServer).TeacherReport(ctx, req.(*GetListTeacherRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TeacherService_ServiceDesc is the grpc.ServiceDesc for TeacherService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -287,6 +320,10 @@ var TeacherService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetByGmail",
 			Handler:    _TeacherService_GetByGmail_Handler,
+		},
+		{
+			MethodName: "TeacherReport",
+			Handler:    _TeacherService_TeacherReport_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
