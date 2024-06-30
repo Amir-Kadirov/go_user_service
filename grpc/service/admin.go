@@ -87,7 +87,7 @@ func (c *AdminService) Delete(ctx context.Context, req *user_service.AdminPrimar
 	return resp, nil
 }
 
-func (c *AdminService) GetByGmail(ctx context.Context, req *user_service.AdminGmail) (*user_service.AdminPrimaryKey, error) {
+func (c *AdminService) GetByGmail(ctx context.Context, req *user_service.AdminGmail) (*user_service.AdminGmailRes, error) {
 	c.log.Info("---GetByGmailAdmin--->>>", logger.Any("req", req))
 
 	resp, err := c.strg.Admin().GetByGmail(ctx, req)
@@ -98,3 +98,16 @@ func (c *AdminService) GetByGmail(ctx context.Context, req *user_service.AdminGm
 
 	return resp, nil
 }
+
+func (c *AdminService) AdminReport(ctx context.Context, req *user_service.GetListAdminRequest) (*user_service.GetRepAdminResponse, error) {
+	c.log.Info("---AdminReportAdmin--->>>", logger.Any("req", req))
+
+	resp, err := c.strg.Admin().AdminReport(ctx, req)
+	if err != nil {
+		c.log.Error("---AdminReportAdmin--->>>", logger.Error(err))
+		return nil, err
+	}
+
+	return resp, nil
+}
+

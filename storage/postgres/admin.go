@@ -27,6 +27,11 @@ func (c *AdminRepo) Create(ctx context.Context, req *ct.CreateAdmin) (*ct.AdminP
 	id := uuid.NewString()
 	resp := &ct.AdminPrimaryKey{Id: id}
 
+	login,err:=helper.GenerateLoginID(c.db,"Admin")
+	if err != nil {
+		return nil, err
+	}
+
 	query := `INSERT INTO "Administration" (
 			"ID",
 			"FullName",
@@ -36,7 +41,8 @@ func (c *AdminRepo) Create(ctx context.Context, req *ct.CreateAdmin) (*ct.AdminP
 			"Salary",
 			"IeltsScore",
 			"BranchID",
-			"created_at") VALUES (
+			"created_at",
+			"LoginID") VALUES (
 				$1,
 				$2,
 				$3,
@@ -45,7 +51,8 @@ func (c *AdminRepo) Create(ctx context.Context, req *ct.CreateAdmin) (*ct.AdminP
 				$6,
 				$7,
 				$8,
-				NOW()
+				NOW(),
+				$9
 			)`
 		hashedPassword,err:=hash.HashPassword(req.Password)
 		if err != nil {
@@ -53,7 +60,7 @@ func (c *AdminRepo) Create(ctx context.Context, req *ct.CreateAdmin) (*ct.AdminP
 		}
 
 	_, err = c.db.Exec(ctx, query, id,req.Fullname, req.Phone, hashedPassword, req.Email, 
-		req.Salary, req.Ieltsscore,req.Branchid)
+		req.Salary, req.Ieltsscore,req.Branchid,login)
 	if err != nil {
 		log.Println("error while creating admin")
 		return nil, err
@@ -201,13 +208,78 @@ func (c *AdminRepo) Delete(ctx context.Context, req *ct.AdminPrimaryKey) (*ct.AD
 	return resp, nil
 }
 
-func (c *AdminRepo) GetByGmail(ctx context.Context, req *ct.AdminGmail) (*ct.AdminPrimaryKey, error) {
-	query := `SELECT "ID" FROM "Administration" WHERE "Email"=$1`
-	var id string
-	err := c.db.QueryRow(ctx, query, req.Gmail).Scan(&id)
+func (c *AdminRepo) GetByGmail(ctx context.Context, req *ct.AdminGmail) (*ct.AdminGmailRes, error) {
+	resp:=&ct.AdminGmailRes{}
+	query := `SELECT "ID","Password" FROM "Administration" WHERE "Email"=$1`
+	err := c.db.QueryRow(ctx, query, req.Gmail).Scan(&resp.Gmail,&resp.Password)
 	if err != nil {
 		return nil, err
 	}
 
-	return &ct.AdminPrimaryKey{Id: id}, nil
+	return resp, nil
+}
+
+func (c *AdminRepo) AdminReport(ctx context.Context, req *ct.GetListAdminRequest) (*ct.GetRepAdminResponse, error) {
+	resp := &ct.GetRepAdminResponse{}
+
+	if req.Offset==0 {
+		req.Offset=1
+	}
+
+	filter := ""
+	offset := (req.Offset - 1) * req.Limit
+
+	if req.Search != "" {
+		filter = ` AND "BranchID" ILIKE '%` + req.Search + `%' `
+	}
+
+	query := `SELECT
+					"ID",
+					"FullName",
+					"Phone",
+					"Salary",
+					"IeltsScore",
+					"BranchID",
+					"created_at",
+					"updated_at"
+			FROM "Administration"
+        	WHERE "deleted_at" is null AND TRUE ` + filter + `
+           OFFSET $1 LIMIT $2
+    `	
+
+	rows, err := c.db.Query(ctx, query, offset, req.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		Admin := &ct.AdminRep{}
+		var createdAt, updatedAt sql.NullTime
+		if err := rows.Scan(
+			&Admin.Id,
+			&Admin.Fullname,
+			&Admin.Phone,
+			&Admin.Salary,
+			&Admin.Ieltsscore,
+			&Admin.BranchId,
+			&createdAt,
+			&updatedAt); err != nil {
+			return nil, err
+		}
+
+		Admin.MonhtWorked=int32(helper.DateSince(createdAt))
+		Admin.TotalSum=Admin.MonhtWorked*Admin.Salary
+		Admin.CreatedAt = helper.NullTimeStampToString(createdAt)
+		Admin.UpdatedAt = helper.NullTimeStampToString(updatedAt)
+		resp.Admin = append(resp.Admin, Admin)
+	}
+
+	queryCount := `SELECT COUNT(*) FROM "Administration" WHERE "deleted_at" is null AND TRUE ` + filter
+	err = c.db.QueryRow(ctx, queryCount).Scan(&resp.Count)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
 }

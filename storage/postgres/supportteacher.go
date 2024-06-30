@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 	ct "user_service/genproto/genproto/user_service"
 	"user_service/pkg/hash"
@@ -27,6 +28,11 @@ func (c *SupportTeacherRepo) Create(ctx context.Context, req *ct.CreateSupportTe
 	id := uuid.NewString()
 	resp := &ct.SupportTeacherPrimaryKey{Id: id}
 
+	login,err:=helper.GenerateLoginID(c.db,"SupportTeacher")
+	if err != nil {
+		return nil, err
+	}
+
 	query := `INSERT INTO "SupportTeacher" (
 			"ID",
 			"FullName",
@@ -37,7 +43,8 @@ func (c *SupportTeacherRepo) Create(ctx context.Context, req *ct.CreateSupportTe
 			"IeltsScore",
 			"IeltsAttemptsCount",
 			"BranchID",
-			"created_at") VALUES (
+			"created_at",
+			"LoginID") VALUES (
 				$1,
 				$2,
 				$3,
@@ -47,7 +54,8 @@ func (c *SupportTeacherRepo) Create(ctx context.Context, req *ct.CreateSupportTe
 				$7,
 				$8,
 				$9,
-				NOW()
+				NOW(),
+				$10
 			)`
 		hashedPassword,err:=hash.HashPassword(req.Password)
 		if err != nil {
@@ -55,7 +63,7 @@ func (c *SupportTeacherRepo) Create(ctx context.Context, req *ct.CreateSupportTe
 		}
 
 	_, err = c.db.Exec(ctx, query, id,req.Fullname, req.Phone, hashedPassword, req.Email, 
-		req.Salary, req.Ieltsscore,req.Ieltsattemptscount,req.Branchid)
+		req.Salary, req.Ieltsscore,req.Ieltsattemptscount,req.Branchid,login)
 	if err != nil {
 		log.Println("error while creating supportteacher")
 		return nil, err
@@ -208,13 +216,80 @@ func (c *SupportTeacherRepo) Delete(ctx context.Context, req *ct.SupportTeacherP
 	return resp, nil
 }
 
-func (c *SupportTeacherRepo) GetByGmail(ctx context.Context, req *ct.SupportTeacherGmail) (*ct.SupportTeacherPrimaryKey, error) {
-	query := `SELECT "ID" FROM "SupportTeacher" WHERE "Email"=$1`
-	var id string
-	err := c.db.QueryRow(ctx, query, req.Gmail).Scan(&id)
+func (c *SupportTeacherRepo) GetByGmail(ctx context.Context, req *ct.SupportTeacherGmail) (*ct.SupportTeacherGmailRes, error) {
+	resp:=&ct.SupportTeacherGmailRes{}
+	query := `SELECT "ID","Password" FROM "SupportTeacher" WHERE "Email"=$1`
+	err := c.db.QueryRow(ctx, query, req.Gmail).Scan(&resp.Gmail,&resp.Password)
 	if err != nil {
 		return nil, err
 	}
 
-	return &ct.SupportTeacherPrimaryKey{Id: id}, nil
+	return resp, nil
+}
+
+func (c *SupportTeacherRepo) SupportTeacherReport(ctx context.Context, req *ct.GetListSupportTeacherRequest) (*ct.GetRepSupportTeacherResponse, error) {
+	resp := &ct.GetRepSupportTeacherResponse{}
+
+	if req.Offset==0 {
+		req.Offset=1
+	}
+
+	filter := ""
+	offset := (req.Offset - 1) * req.Limit
+
+	if req.Search != "" {
+		filter = ` AND "BranchID" ILIKE '%` + req.Search + `%' `
+	}
+
+	query := `SELECT
+					"ID",
+					"FullName",
+					"Phone",
+					"Salary",
+					"IeltsScore",
+					"BranchID",
+					"created_at",
+					"updated_at"
+			FROM "SupportTeacher"
+        	WHERE "deleted_at" is null AND TRUE ` + filter + `
+           OFFSET $1 LIMIT $2
+    `	
+
+	rows, err := c.db.Query(ctx, query, offset, req.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		SupportTeacher := &ct.SupportTeacherRep{}
+		var createdAt, updatedAt sql.NullTime
+		if err := rows.Scan(
+			&SupportTeacher.Id,
+			&SupportTeacher.Fullname,
+			&SupportTeacher.Phone,
+			&SupportTeacher.Salary,
+			&SupportTeacher.Ieltsscore,
+			&SupportTeacher.BranchId,
+			&createdAt,
+			&updatedAt); err != nil {
+			return nil, err
+		}
+
+		SupportTeacher.MonhtWorked=int32(helper.DateSince(createdAt))
+		fmt.Println("Month worked",SupportTeacher.MonhtWorked)
+		SupportTeacher.TotalSum=SupportTeacher.MonhtWorked*SupportTeacher.Salary
+		fmt.Println("Total sum",SupportTeacher.TotalSum)
+		SupportTeacher.CreatedAt = helper.NullTimeStampToString(createdAt)
+		SupportTeacher.UpdatedAt = helper.NullTimeStampToString(updatedAt)
+		resp.SupportTeacher= append(resp.SupportTeacher, SupportTeacher)
+	}
+
+	queryCount := `SELECT COUNT(*) FROM "SupportTeacher" WHERE "deleted_at" is null AND TRUE ` + filter
+	err = c.db.QueryRow(ctx, queryCount).Scan(&resp.Count)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
 }

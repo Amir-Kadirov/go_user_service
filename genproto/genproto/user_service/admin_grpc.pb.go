@@ -19,12 +19,13 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	AdminService_Create_FullMethodName     = "/user_service.AdminService/Create"
-	AdminService_GetByID_FullMethodName    = "/user_service.AdminService/GetByID"
-	AdminService_GetList_FullMethodName    = "/user_service.AdminService/GetList"
-	AdminService_Update_FullMethodName     = "/user_service.AdminService/Update"
-	AdminService_Delete_FullMethodName     = "/user_service.AdminService/Delete"
-	AdminService_GetByGmail_FullMethodName = "/user_service.AdminService/GetByGmail"
+	AdminService_Create_FullMethodName      = "/user_service.AdminService/Create"
+	AdminService_GetByID_FullMethodName     = "/user_service.AdminService/GetByID"
+	AdminService_GetList_FullMethodName     = "/user_service.AdminService/GetList"
+	AdminService_Update_FullMethodName      = "/user_service.AdminService/Update"
+	AdminService_Delete_FullMethodName      = "/user_service.AdminService/Delete"
+	AdminService_GetByGmail_FullMethodName  = "/user_service.AdminService/GetByGmail"
+	AdminService_AdminReport_FullMethodName = "/user_service.AdminService/AdminReport"
 )
 
 // AdminServiceClient is the client API for AdminService service.
@@ -36,7 +37,8 @@ type AdminServiceClient interface {
 	GetList(ctx context.Context, in *GetListAdminRequest, opts ...grpc.CallOption) (*GetListAdminResponse, error)
 	Update(ctx context.Context, in *UpdateAdminRequest, opts ...grpc.CallOption) (*ADMessage, error)
 	Delete(ctx context.Context, in *AdminPrimaryKey, opts ...grpc.CallOption) (*ADMessage, error)
-	GetByGmail(ctx context.Context, in *AdminGmail, opts ...grpc.CallOption) (*AdminPrimaryKey, error)
+	GetByGmail(ctx context.Context, in *AdminGmail, opts ...grpc.CallOption) (*AdminGmailRes, error)
+	AdminReport(ctx context.Context, in *GetListAdminRequest, opts ...grpc.CallOption) (*GetRepAdminResponse, error)
 }
 
 type adminServiceClient struct {
@@ -92,9 +94,18 @@ func (c *adminServiceClient) Delete(ctx context.Context, in *AdminPrimaryKey, op
 	return out, nil
 }
 
-func (c *adminServiceClient) GetByGmail(ctx context.Context, in *AdminGmail, opts ...grpc.CallOption) (*AdminPrimaryKey, error) {
-	out := new(AdminPrimaryKey)
+func (c *adminServiceClient) GetByGmail(ctx context.Context, in *AdminGmail, opts ...grpc.CallOption) (*AdminGmailRes, error) {
+	out := new(AdminGmailRes)
 	err := c.cc.Invoke(ctx, AdminService_GetByGmail_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *adminServiceClient) AdminReport(ctx context.Context, in *GetListAdminRequest, opts ...grpc.CallOption) (*GetRepAdminResponse, error) {
+	out := new(GetRepAdminResponse)
+	err := c.cc.Invoke(ctx, AdminService_AdminReport_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +121,8 @@ type AdminServiceServer interface {
 	GetList(context.Context, *GetListAdminRequest) (*GetListAdminResponse, error)
 	Update(context.Context, *UpdateAdminRequest) (*ADMessage, error)
 	Delete(context.Context, *AdminPrimaryKey) (*ADMessage, error)
-	GetByGmail(context.Context, *AdminGmail) (*AdminPrimaryKey, error)
+	GetByGmail(context.Context, *AdminGmail) (*AdminGmailRes, error)
+	AdminReport(context.Context, *GetListAdminRequest) (*GetRepAdminResponse, error)
 	mustEmbedUnimplementedAdminServiceServer()
 }
 
@@ -133,8 +145,11 @@ func (UnimplementedAdminServiceServer) Update(context.Context, *UpdateAdminReque
 func (UnimplementedAdminServiceServer) Delete(context.Context, *AdminPrimaryKey) (*ADMessage, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
-func (UnimplementedAdminServiceServer) GetByGmail(context.Context, *AdminGmail) (*AdminPrimaryKey, error) {
+func (UnimplementedAdminServiceServer) GetByGmail(context.Context, *AdminGmail) (*AdminGmailRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetByGmail not implemented")
+}
+func (UnimplementedAdminServiceServer) AdminReport(context.Context, *GetListAdminRequest) (*GetRepAdminResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AdminReport not implemented")
 }
 func (UnimplementedAdminServiceServer) mustEmbedUnimplementedAdminServiceServer() {}
 
@@ -257,6 +272,24 @@ func _AdminService_GetByGmail_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AdminService_AdminReport_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetListAdminRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServiceServer).AdminReport(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AdminService_AdminReport_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServiceServer).AdminReport(ctx, req.(*GetListAdminRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AdminService_ServiceDesc is the grpc.ServiceDesc for AdminService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -287,6 +320,10 @@ var AdminService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetByGmail",
 			Handler:    _AdminService_GetByGmail_Handler,
+		},
+		{
+			MethodName: "AdminReport",
+			Handler:    _AdminService_AdminReport_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

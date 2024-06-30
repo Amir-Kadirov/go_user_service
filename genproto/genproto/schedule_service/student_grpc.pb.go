@@ -19,12 +19,13 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	StudentService_Create_FullMethodName     = "/schedule_service.StudentService/Create"
-	StudentService_GetByID_FullMethodName    = "/schedule_service.StudentService/GetByID"
-	StudentService_GetList_FullMethodName    = "/schedule_service.StudentService/GetList"
-	StudentService_Update_FullMethodName     = "/schedule_service.StudentService/Update"
-	StudentService_Delete_FullMethodName     = "/schedule_service.StudentService/Delete"
-	StudentService_GetByGmail_FullMethodName = "/schedule_service.StudentService/GetByGmail"
+	StudentService_Create_FullMethodName        = "/schedule_service.StudentService/Create"
+	StudentService_GetByID_FullMethodName       = "/schedule_service.StudentService/GetByID"
+	StudentService_GetList_FullMethodName       = "/schedule_service.StudentService/GetList"
+	StudentService_Update_FullMethodName        = "/schedule_service.StudentService/Update"
+	StudentService_Delete_FullMethodName        = "/schedule_service.StudentService/Delete"
+	StudentService_GetByGmail_FullMethodName    = "/schedule_service.StudentService/GetByGmail"
+	StudentService_StudentReport_FullMethodName = "/schedule_service.StudentService/StudentReport"
 )
 
 // StudentServiceClient is the client API for StudentService service.
@@ -36,7 +37,8 @@ type StudentServiceClient interface {
 	GetList(ctx context.Context, in *GetListStudentRequest, opts ...grpc.CallOption) (*GetListStudentResponse, error)
 	Update(ctx context.Context, in *UpdateStudentRequest, opts ...grpc.CallOption) (*STMessage, error)
 	Delete(ctx context.Context, in *StudentPrimaryKey, opts ...grpc.CallOption) (*STMessage, error)
-	GetByGmail(ctx context.Context, in *StudentGmail, opts ...grpc.CallOption) (*StudentPrimaryKey, error)
+	GetByGmail(ctx context.Context, in *StudentGmail, opts ...grpc.CallOption) (*StudentGmailRes, error)
+	StudentReport(ctx context.Context, in *GetListStudentRequest, opts ...grpc.CallOption) (*GetRepStudent, error)
 }
 
 type studentServiceClient struct {
@@ -92,9 +94,18 @@ func (c *studentServiceClient) Delete(ctx context.Context, in *StudentPrimaryKey
 	return out, nil
 }
 
-func (c *studentServiceClient) GetByGmail(ctx context.Context, in *StudentGmail, opts ...grpc.CallOption) (*StudentPrimaryKey, error) {
-	out := new(StudentPrimaryKey)
+func (c *studentServiceClient) GetByGmail(ctx context.Context, in *StudentGmail, opts ...grpc.CallOption) (*StudentGmailRes, error) {
+	out := new(StudentGmailRes)
 	err := c.cc.Invoke(ctx, StudentService_GetByGmail_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *studentServiceClient) StudentReport(ctx context.Context, in *GetListStudentRequest, opts ...grpc.CallOption) (*GetRepStudent, error) {
+	out := new(GetRepStudent)
+	err := c.cc.Invoke(ctx, StudentService_StudentReport_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +121,8 @@ type StudentServiceServer interface {
 	GetList(context.Context, *GetListStudentRequest) (*GetListStudentResponse, error)
 	Update(context.Context, *UpdateStudentRequest) (*STMessage, error)
 	Delete(context.Context, *StudentPrimaryKey) (*STMessage, error)
-	GetByGmail(context.Context, *StudentGmail) (*StudentPrimaryKey, error)
+	GetByGmail(context.Context, *StudentGmail) (*StudentGmailRes, error)
+	StudentReport(context.Context, *GetListStudentRequest) (*GetRepStudent, error)
 	mustEmbedUnimplementedStudentServiceServer()
 }
 
@@ -133,8 +145,11 @@ func (UnimplementedStudentServiceServer) Update(context.Context, *UpdateStudentR
 func (UnimplementedStudentServiceServer) Delete(context.Context, *StudentPrimaryKey) (*STMessage, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
-func (UnimplementedStudentServiceServer) GetByGmail(context.Context, *StudentGmail) (*StudentPrimaryKey, error) {
+func (UnimplementedStudentServiceServer) GetByGmail(context.Context, *StudentGmail) (*StudentGmailRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetByGmail not implemented")
+}
+func (UnimplementedStudentServiceServer) StudentReport(context.Context, *GetListStudentRequest) (*GetRepStudent, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StudentReport not implemented")
 }
 func (UnimplementedStudentServiceServer) mustEmbedUnimplementedStudentServiceServer() {}
 
@@ -257,6 +272,24 @@ func _StudentService_GetByGmail_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _StudentService_StudentReport_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetListStudentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StudentServiceServer).StudentReport(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StudentService_StudentReport_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StudentServiceServer).StudentReport(ctx, req.(*GetListStudentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // StudentService_ServiceDesc is the grpc.ServiceDesc for StudentService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -287,6 +320,10 @@ var StudentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetByGmail",
 			Handler:    _StudentService_GetByGmail_Handler,
+		},
+		{
+			MethodName: "StudentReport",
+			Handler:    _StudentService_StudentReport_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

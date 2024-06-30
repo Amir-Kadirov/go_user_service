@@ -19,12 +19,13 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	SupportTeacherService_Create_FullMethodName     = "/user_service.SupportTeacherService/Create"
-	SupportTeacherService_GetByID_FullMethodName    = "/user_service.SupportTeacherService/GetByID"
-	SupportTeacherService_GetList_FullMethodName    = "/user_service.SupportTeacherService/GetList"
-	SupportTeacherService_Update_FullMethodName     = "/user_service.SupportTeacherService/Update"
-	SupportTeacherService_Delete_FullMethodName     = "/user_service.SupportTeacherService/Delete"
-	SupportTeacherService_GetByGmail_FullMethodName = "/user_service.SupportTeacherService/GetByGmail"
+	SupportTeacherService_Create_FullMethodName               = "/user_service.SupportTeacherService/Create"
+	SupportTeacherService_GetByID_FullMethodName              = "/user_service.SupportTeacherService/GetByID"
+	SupportTeacherService_GetList_FullMethodName              = "/user_service.SupportTeacherService/GetList"
+	SupportTeacherService_Update_FullMethodName               = "/user_service.SupportTeacherService/Update"
+	SupportTeacherService_Delete_FullMethodName               = "/user_service.SupportTeacherService/Delete"
+	SupportTeacherService_GetByGmail_FullMethodName           = "/user_service.SupportTeacherService/GetByGmail"
+	SupportTeacherService_SupportTeacherReport_FullMethodName = "/user_service.SupportTeacherService/SupportTeacherReport"
 )
 
 // SupportTeacherServiceClient is the client API for SupportTeacherService service.
@@ -36,7 +37,8 @@ type SupportTeacherServiceClient interface {
 	GetList(ctx context.Context, in *GetListSupportTeacherRequest, opts ...grpc.CallOption) (*GetListSupportTeacherResponse, error)
 	Update(ctx context.Context, in *UpdateSupportTeacherRequest, opts ...grpc.CallOption) (*STMessage, error)
 	Delete(ctx context.Context, in *SupportTeacherPrimaryKey, opts ...grpc.CallOption) (*STMessage, error)
-	GetByGmail(ctx context.Context, in *SupportTeacherGmail, opts ...grpc.CallOption) (*SupportTeacherPrimaryKey, error)
+	GetByGmail(ctx context.Context, in *SupportTeacherGmail, opts ...grpc.CallOption) (*SupportTeacherGmailRes, error)
+	SupportTeacherReport(ctx context.Context, in *GetListSupportTeacherRequest, opts ...grpc.CallOption) (*GetRepSupportTeacherResponse, error)
 }
 
 type supportTeacherServiceClient struct {
@@ -92,9 +94,18 @@ func (c *supportTeacherServiceClient) Delete(ctx context.Context, in *SupportTea
 	return out, nil
 }
 
-func (c *supportTeacherServiceClient) GetByGmail(ctx context.Context, in *SupportTeacherGmail, opts ...grpc.CallOption) (*SupportTeacherPrimaryKey, error) {
-	out := new(SupportTeacherPrimaryKey)
+func (c *supportTeacherServiceClient) GetByGmail(ctx context.Context, in *SupportTeacherGmail, opts ...grpc.CallOption) (*SupportTeacherGmailRes, error) {
+	out := new(SupportTeacherGmailRes)
 	err := c.cc.Invoke(ctx, SupportTeacherService_GetByGmail_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *supportTeacherServiceClient) SupportTeacherReport(ctx context.Context, in *GetListSupportTeacherRequest, opts ...grpc.CallOption) (*GetRepSupportTeacherResponse, error) {
+	out := new(GetRepSupportTeacherResponse)
+	err := c.cc.Invoke(ctx, SupportTeacherService_SupportTeacherReport_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +121,8 @@ type SupportTeacherServiceServer interface {
 	GetList(context.Context, *GetListSupportTeacherRequest) (*GetListSupportTeacherResponse, error)
 	Update(context.Context, *UpdateSupportTeacherRequest) (*STMessage, error)
 	Delete(context.Context, *SupportTeacherPrimaryKey) (*STMessage, error)
-	GetByGmail(context.Context, *SupportTeacherGmail) (*SupportTeacherPrimaryKey, error)
+	GetByGmail(context.Context, *SupportTeacherGmail) (*SupportTeacherGmailRes, error)
+	SupportTeacherReport(context.Context, *GetListSupportTeacherRequest) (*GetRepSupportTeacherResponse, error)
 	mustEmbedUnimplementedSupportTeacherServiceServer()
 }
 
@@ -133,8 +145,11 @@ func (UnimplementedSupportTeacherServiceServer) Update(context.Context, *UpdateS
 func (UnimplementedSupportTeacherServiceServer) Delete(context.Context, *SupportTeacherPrimaryKey) (*STMessage, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
-func (UnimplementedSupportTeacherServiceServer) GetByGmail(context.Context, *SupportTeacherGmail) (*SupportTeacherPrimaryKey, error) {
+func (UnimplementedSupportTeacherServiceServer) GetByGmail(context.Context, *SupportTeacherGmail) (*SupportTeacherGmailRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetByGmail not implemented")
+}
+func (UnimplementedSupportTeacherServiceServer) SupportTeacherReport(context.Context, *GetListSupportTeacherRequest) (*GetRepSupportTeacherResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SupportTeacherReport not implemented")
 }
 func (UnimplementedSupportTeacherServiceServer) mustEmbedUnimplementedSupportTeacherServiceServer() {}
 
@@ -257,6 +272,24 @@ func _SupportTeacherService_GetByGmail_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SupportTeacherService_SupportTeacherReport_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetListSupportTeacherRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SupportTeacherServiceServer).SupportTeacherReport(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SupportTeacherService_SupportTeacherReport_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SupportTeacherServiceServer).SupportTeacherReport(ctx, req.(*GetListSupportTeacherRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SupportTeacherService_ServiceDesc is the grpc.ServiceDesc for SupportTeacherService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -287,6 +320,10 @@ var SupportTeacherService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetByGmail",
 			Handler:    _SupportTeacherService_GetByGmail_Handler,
+		},
+		{
+			MethodName: "SupportTeacherReport",
+			Handler:    _SupportTeacherService_SupportTeacherReport_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

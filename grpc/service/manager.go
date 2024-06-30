@@ -87,7 +87,7 @@ func (c *ManagerService) Delete(ctx context.Context, req *user_service.ManagerPr
 	return resp, nil
 }
 
-func (c *ManagerService) GetByGmail(ctx context.Context, req *user_service.ManagerGmail) (*user_service.ManagerPrimaryKey, error) {
+func (c *ManagerService) GetByGmail(ctx context.Context, req *user_service.ManagerGmail) (*user_service.ManagerGmailRes, error) {
 	c.log.Info("---GetByGmailManager--->>>", logger.Any("req", req))
 
 	resp, err := c.strg.Manager().GetByGmail(ctx, req)

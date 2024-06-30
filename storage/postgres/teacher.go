@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"log"
 	ct "user_service/genproto/genproto/user_service"
 	"user_service/pkg/hash"
@@ -28,6 +29,11 @@ func (c *TeacherRepo) Create(ctx context.Context, req *ct.CreateTeacher) (*ct.Te
 	id := uuid.NewString()
 	resp := &ct.TeacherPrimaryKey{Id: id}
 
+	login,err:=helper.GenerateLoginID(c.db,"Teacher")
+	if err != nil {
+		return nil, err
+	}
+
 	query := `INSERT INTO "Teacher" (
 			"ID",
 			"FullName",
@@ -39,7 +45,8 @@ func (c *TeacherRepo) Create(ctx context.Context, req *ct.CreateTeacher) (*ct.Te
 			"IeltsAttemptsCount",
 			"SupportTeacherID",	
 			"BranchID",
-			"created_at") VALUES (
+			"created_at",
+			"LoginID") VALUES (
 				$1,
 				$2,
 				$3,
@@ -50,7 +57,8 @@ func (c *TeacherRepo) Create(ctx context.Context, req *ct.CreateTeacher) (*ct.Te
 				$8,
 				$9,
 				$10,
-				NOW()
+				NOW(),
+				$11
 			)`
 	hashedPassword, err := hash.HashPassword(req.Password)
 	if err != nil {
@@ -58,7 +66,7 @@ func (c *TeacherRepo) Create(ctx context.Context, req *ct.CreateTeacher) (*ct.Te
 	}
 
 	_, err = c.db.Exec(ctx, query, id, req.Fullname, req.Phone, hashedPassword, req.Email,
-		req.Salary, req.Ieltsscore, req.Ieltsattemptscount, req.Supportteacherid, req.Branchid)
+		req.Salary, req.Ieltsscore, req.Ieltsattemptscount, req.Supportteacherid, req.Branchid,login)
 	if err != nil {
 		log.Println("error while creating teacher")
 		return nil, err
@@ -109,6 +117,10 @@ func (c *TeacherRepo) GetByID(ctx context.Context, req *ct.TeacherPrimaryKey) (*
 
 func (c *TeacherRepo) GetList(ctx context.Context, req *ct.GetListTeacherRequest) (*ct.GetListTeacherResponse, error) {
 	resp := &ct.GetListTeacherResponse{}
+
+	if req.Offset==0 {
+		req.Offset=1
+	}
 
 	filter := ""
 	offset := (req.Offset - 1) * req.Limit
@@ -214,19 +226,23 @@ func (c *TeacherRepo) Delete(ctx context.Context, req *ct.TeacherPrimaryKey) (*c
 	return resp, nil
 }
 
-func (c *TeacherRepo) GetByGmail(ctx context.Context, req *ct.TeacherGmail) (*ct.TeacherPrimaryKey, error) {
-	query := `SELECT "ID" FROM "Teacher" WHERE "Email"=$1`
-	var id string
-	err := c.db.QueryRow(ctx, query, req.Gmail).Scan(&id)
+func (c *TeacherRepo) GetByGmail(ctx context.Context, req *ct.TeacherGmail) (*ct.TeacherGmailRes, error) {
+	resp:=&ct.TeacherGmailRes{}
+	query := `SELECT "ID","Password" FROM "Teacher" WHERE "Email"=$1`
+	err := c.db.QueryRow(ctx, query, req.Gmail).Scan(&resp.Gmail,&resp.Password)
 	if err != nil {
 		return nil, err
 	}
 
-	return &ct.TeacherPrimaryKey{Id: id}, nil
+	return resp, nil
 }
 
 func (c *TeacherRepo) TeacherReport(ctx context.Context, req *ct.GetListTeacherRequest) (*ct.GetRepTeacherResponse, error) {
 	resp := &ct.GetRepTeacherResponse{}
+
+	if req.Offset==0 {
+		req.Offset=1
+	}
 
 	filter := ""
 	offset := (req.Offset - 1) * req.Limit
@@ -239,7 +255,7 @@ func (c *TeacherRepo) TeacherReport(ctx context.Context, req *ct.GetListTeacherR
 					"ID",
 					"FullName",
 					"Phone",
-=					"Salary",
+					"Salary",
 					"IeltsScore",
 					"BranchID",
 					"created_at",
@@ -247,7 +263,7 @@ func (c *TeacherRepo) TeacherReport(ctx context.Context, req *ct.GetListTeacherR
 			FROM "Teacher"
         	WHERE "deleted_at" is null AND TRUE ` + filter + `
            OFFSET $1 LIMIT $2
-    `
+    `	
 
 	rows, err := c.db.Query(ctx, query, offset, req.Limit)
 	if err != nil {
@@ -271,7 +287,9 @@ func (c *TeacherRepo) TeacherReport(ctx context.Context, req *ct.GetListTeacherR
 		}
 
 		Teacher.MonhtWorked=int32(helper.DateSince(createdAt))
+		fmt.Println("Month worked",Teacher.MonhtWorked)
 		Teacher.TotalSum=Teacher.MonhtWorked*Teacher.Salary
+		fmt.Println("Total sum",Teacher.TotalSum)
 		Teacher.CreatedAt = helper.NullTimeStampToString(createdAt)
 		Teacher.UpdatedAt = helper.NullTimeStampToString(updatedAt)
 		resp.Teacher = append(resp.Teacher, Teacher)

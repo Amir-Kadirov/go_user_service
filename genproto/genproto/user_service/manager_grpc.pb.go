@@ -36,7 +36,7 @@ type ManagerServiceClient interface {
 	GetList(ctx context.Context, in *GetListManagerRequest, opts ...grpc.CallOption) (*GetListManagerResponse, error)
 	Update(ctx context.Context, in *UpdateManagerRequest, opts ...grpc.CallOption) (*MGMessage, error)
 	Delete(ctx context.Context, in *ManagerPrimaryKey, opts ...grpc.CallOption) (*MGMessage, error)
-	GetByGmail(ctx context.Context, in *ManagerGmail, opts ...grpc.CallOption) (*ManagerPrimaryKey, error)
+	GetByGmail(ctx context.Context, in *ManagerGmail, opts ...grpc.CallOption) (*ManagerGmailRes, error)
 }
 
 type managerServiceClient struct {
@@ -92,8 +92,8 @@ func (c *managerServiceClient) Delete(ctx context.Context, in *ManagerPrimaryKey
 	return out, nil
 }
 
-func (c *managerServiceClient) GetByGmail(ctx context.Context, in *ManagerGmail, opts ...grpc.CallOption) (*ManagerPrimaryKey, error) {
-	out := new(ManagerPrimaryKey)
+func (c *managerServiceClient) GetByGmail(ctx context.Context, in *ManagerGmail, opts ...grpc.CallOption) (*ManagerGmailRes, error) {
+	out := new(ManagerGmailRes)
 	err := c.cc.Invoke(ctx, ManagerService_GetByGmail_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -110,7 +110,7 @@ type ManagerServiceServer interface {
 	GetList(context.Context, *GetListManagerRequest) (*GetListManagerResponse, error)
 	Update(context.Context, *UpdateManagerRequest) (*MGMessage, error)
 	Delete(context.Context, *ManagerPrimaryKey) (*MGMessage, error)
-	GetByGmail(context.Context, *ManagerGmail) (*ManagerPrimaryKey, error)
+	GetByGmail(context.Context, *ManagerGmail) (*ManagerGmailRes, error)
 	mustEmbedUnimplementedManagerServiceServer()
 }
 
@@ -133,7 +133,7 @@ func (UnimplementedManagerServiceServer) Update(context.Context, *UpdateManagerR
 func (UnimplementedManagerServiceServer) Delete(context.Context, *ManagerPrimaryKey) (*MGMessage, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
-func (UnimplementedManagerServiceServer) GetByGmail(context.Context, *ManagerGmail) (*ManagerPrimaryKey, error) {
+func (UnimplementedManagerServiceServer) GetByGmail(context.Context, *ManagerGmail) (*ManagerGmailRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetByGmail not implemented")
 }
 func (UnimplementedManagerServiceServer) mustEmbedUnimplementedManagerServiceServer() {}

@@ -61,6 +61,15 @@ CREATE TABLE IF NOT EXISTS "Branch" (
   "deleted_at" timestamp
 );
 
+ALTER TABLE "Teacher" ADD COLUMN "LoginID" varchar UNIQUE;
+
+ALTER TABLE "Manager" ADD COLUMN "LoginID" varchar UNIQUE;
+
+ALTER TABLE "Administration" ADD COLUMN "LoginID" varchar UNIQUE;
+
+ALTER TABLE "SupportTeacher" ADD COLUMN "LoginID" varchar UNIQUE;
+
+
 ALTER TABLE "Teacher" ADD FOREIGN KEY ("SupportTeacherID") REFERENCES "SupportTeacher" ("ID");
 
 ALTER TABLE "Teacher" ADD FOREIGN KEY ("BranchID") REFERENCES "Branch" ("ID");

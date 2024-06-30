@@ -87,12 +87,24 @@ func (c *SupportTeacherService) Delete(ctx context.Context, req *user_service.Su
 	return resp, nil
 }
 
-func (c *SupportTeacherService) GetByGmail(ctx context.Context, req *user_service.SupportTeacherGmail) (*user_service.SupportTeacherPrimaryKey, error) {
+func (c *SupportTeacherService) GetByGmail(ctx context.Context, req *user_service.SupportTeacherGmail) (*user_service.SupportTeacherGmailRes, error) {
 	c.log.Info("---GetByGmailSupportTeacher--->>>", logger.Any("req", req))
 
 	resp, err := c.strg.SupportTeacher().GetByGmail(ctx, req)
 	if err != nil {
 		c.log.Error("---GetByGmailSupportTeacher--->>>", logger.Error(err))
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (c *SupportTeacherService) SupportTeacherReport(ctx context.Context, req *user_service.GetListSupportTeacherRequest) (*user_service.GetRepSupportTeacherResponse, error) {
+	c.log.Info("---SupportTeacherReport--->>>", logger.Any("req", req))
+
+	resp, err := c.strg.SupportTeacher().SupportTeacherReport(ctx, req)
+	if err != nil {
+		c.log.Error("---SupportTeacherReport--->>>", logger.Error(err))
 		return nil, err
 	}
 

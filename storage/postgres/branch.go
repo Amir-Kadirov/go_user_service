@@ -68,9 +68,6 @@ func (c *BranchRepo) GetByID(ctx context.Context, req *ct.BranchPrimaryKey) (*ct
 		&updatedAt)
 
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil,err
-		}
 		return nil, err
 	}
 

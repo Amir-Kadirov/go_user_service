@@ -87,7 +87,7 @@ func (c *TeacherService) Delete(ctx context.Context, req *user_service.TeacherPr
 	return resp, nil
 }
 
-func (c *TeacherService) GetByGmail(ctx context.Context, req *user_service.TeacherGmail) (*user_service.TeacherPrimaryKey, error) {
+func (c *TeacherService) GetByGmail(ctx context.Context, req *user_service.TeacherGmail) (*user_service.TeacherGmailRes, error) {
 	c.log.Info("---GetByGmailTeacher--->>>", logger.Any("req", req))
 
 	resp, err := c.strg.Teacher().GetByGmail(ctx, req)

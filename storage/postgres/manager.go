@@ -27,6 +27,11 @@ func (c *ManagerRepo) Create(ctx context.Context, req *ct.CreateManager) (*ct.Ma
 	id := uuid.NewString()
 	resp := &ct.ManagerPrimaryKey{Id: id}
 
+	login,err:=helper.GenerateLoginID(c.db,"Manager")
+	if err != nil {
+		return nil, err
+	}
+
 	query := `INSERT INTO "Manager" (
 			"ID",
 			"FullName",
@@ -35,7 +40,8 @@ func (c *ManagerRepo) Create(ctx context.Context, req *ct.CreateManager) (*ct.Ma
 			"Email",
 			"Salary",
 			"BranchID",
-			"created_at") VALUES (
+			"created_at",
+			"LoginID") VALUES (
 				$1,
 				$2,
 				$3,
@@ -43,7 +49,8 @@ func (c *ManagerRepo) Create(ctx context.Context, req *ct.CreateManager) (*ct.Ma
 				$5,
 				$6,
 				$7,
-				NOW()
+				NOW(),
+				$8
 			)`
 		hashedPassword,err:=hash.HashPassword(req.Password)
 		if err != nil {
@@ -51,7 +58,7 @@ func (c *ManagerRepo) Create(ctx context.Context, req *ct.CreateManager) (*ct.Ma
 		}
 
 	_, err = c.db.Exec(ctx, query, id,req.Fullname, req.Phone, hashedPassword, req.Email, 
-		req.Salary,req.Branchid)
+		req.Salary,req.Branchid,login)
 	if err != nil {
 		log.Println("error while creating manager")
 		return nil, err
@@ -193,13 +200,13 @@ func (c *ManagerRepo) Delete(ctx context.Context, req *ct.ManagerPrimaryKey) (*c
 	return resp, nil
 }
 
-func (c *ManagerRepo) GetByGmail(ctx context.Context, req *ct.ManagerGmail) (*ct.ManagerPrimaryKey, error) {
-	query := `SELECT "ID" FROM "Manager" WHERE "Email"=$1`
-	var id string
-	err := c.db.QueryRow(ctx, query, req.Gmail).Scan(&id)
+func (c *ManagerRepo) GetByGmail(ctx context.Context, req *ct.ManagerGmail) (*ct.ManagerGmailRes, error) {
+	resp:=&ct.ManagerGmailRes{}
+	query := `SELECT "ID","Password" FROM "Manager" WHERE "Email"=$1`
+	err := c.db.QueryRow(ctx, query, req.Gmail).Scan(&resp.Gmail,&resp.Password)
 	if err != nil {
 		return nil, err
 	}
 
-	return &ct.ManagerPrimaryKey{Id: id}, nil
+	return resp, nil
 }

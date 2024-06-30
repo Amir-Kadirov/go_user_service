@@ -20,7 +20,7 @@ type TeacherRepoI interface {
 	GetList(ctx context.Context, req *ct.GetListTeacherRequest) (resp *ct.GetListTeacherResponse, err error)
 	Update(ctx context.Context, req *ct.UpdateTeacherRequest) (resp *ct.Message, err error)
 	Delete(ctx context.Context, req *ct.TeacherPrimaryKey) (resp *ct.Message, err error)
-	GetByGmail(ctx context.Context, req *ct.TeacherGmail) (*ct.TeacherPrimaryKey, error)
+	GetByGmail(ctx context.Context, req *ct.TeacherGmail) (*ct.TeacherGmailRes, error)
 	TeacherReport(ctx context.Context, req *ct.GetListTeacherRequest) (*ct.GetRepTeacherResponse, error)
 }
 
@@ -30,7 +30,8 @@ type SupportTeacherRepoI interface {
 	GetList(ctx context.Context, req *ct.GetListSupportTeacherRequest) (resp *ct.GetListSupportTeacherResponse, err error)
 	Update(ctx context.Context, req *ct.UpdateSupportTeacherRequest) (resp *ct.STMessage, err error)
 	Delete(ctx context.Context, req *ct.SupportTeacherPrimaryKey) (resp *ct.STMessage, err error)
-	GetByGmail(ctx context.Context, req *ct.SupportTeacherGmail) (*ct.SupportTeacherPrimaryKey, error)
+	GetByGmail(ctx context.Context, req *ct.SupportTeacherGmail) (*ct.SupportTeacherGmailRes, error)
+	SupportTeacherReport(ctx context.Context, req *ct.GetListSupportTeacherRequest) (*ct.GetRepSupportTeacherResponse, error)
 }
 
 type BranchRepoI interface {
@@ -47,7 +48,8 @@ type AdminRepoI interface {
 	GetList(ctx context.Context, req *ct.GetListAdminRequest) (resp *ct.GetListAdminResponse, err error)
 	Update(ctx context.Context, req *ct.UpdateAdminRequest) (resp *ct.ADMessage, err error)
 	Delete(ctx context.Context, req *ct.AdminPrimaryKey) (resp *ct.ADMessage, err error)
-	GetByGmail(ctx context.Context, req *ct.AdminGmail) (*ct.AdminPrimaryKey, error)
+	GetByGmail(ctx context.Context, req *ct.AdminGmail) (*ct.AdminGmailRes, error)
+	AdminReport(ctx context.Context, req *ct.GetListAdminRequest) (*ct.GetRepAdminResponse, error)
 }
 
 type ManagerRepoI interface {
@@ -56,5 +58,5 @@ type ManagerRepoI interface {
 	GetList(ctx context.Context, req *ct.GetListManagerRequest) (resp *ct.GetListManagerResponse, err error)
 	Update(ctx context.Context, req *ct.UpdateManagerRequest) (resp *ct.MGMessage, err error)
 	Delete(ctx context.Context, req *ct.ManagerPrimaryKey) (resp *ct.MGMessage, err error)
-	GetByGmail(ctx context.Context, req *ct.ManagerGmail) (*ct.ManagerPrimaryKey, error)
+	GetByGmail(ctx context.Context, req *ct.ManagerGmail) (*ct.ManagerGmailRes, error)
 }
